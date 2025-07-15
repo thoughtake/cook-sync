@@ -178,23 +178,27 @@ const IngredientsPage = () => {
 
   //[初回]登録されている材料をストレージから取得
   useEffect(() => {
-    const stored = localStorage.getItem("ingredients");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setIngredients(parsed);
+    // const stored = localStorage.getItem("ingredients");
+    // if (stored) {
+    const fetchIngredients = async () => {
+      const res = await fetch("api/ingredients");
+      const data = await res.json();
+      setIngredients(data);
 
-        const maxId =
-          parsed.length > 0
-            ? Math.max(
-                ...parsed.map((ingredient: Ingredient) => ingredient.id)
-              ) + 1
-            : 0;
-        nextId.current = maxId;
-      } catch (err) {
-        console.error("データの取得に失敗", err);
-      }
+      const maxId =
+        data.length > 0
+          ? Math.max(...data.map((ingredient: Ingredient) => ingredient.id)) + 1
+          : 0;
+      nextId.current = maxId;
+    };
+    try {
+      // const parsed = JSON.parse(stored);
+      // setIngredients(parsed);
+      fetchIngredients();
+    } catch (err) {
+      console.error("データの取得に失敗", err);
     }
+    // }
 
     setIsEditMode(false);
   }, []);
