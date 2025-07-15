@@ -1,4 +1,6 @@
 import { IngredientGroup, Unit } from "@/types/indes";
+
+//Propsの型指定
 type Props = {
   inputName: string;
   inputPrice: number | null;
@@ -18,6 +20,8 @@ type Props = {
 };
 
 const IngredientForm = (props: Props) => {
+
+  //Propsを代入
   const {
     inputName,
     inputPrice,
@@ -36,6 +40,7 @@ const IngredientForm = (props: Props) => {
     isDisabled,
   } = props;
 
+  //単位の文言を変更する際に使用
   const unitLabel = selectedUnit
     ? `${selectedUnit.amountPerUnit}${selectedUnit.name}`
     : "1単位";
@@ -45,6 +50,7 @@ const IngredientForm = (props: Props) => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        //編集中かどうかで処理をかえる
         if (isEditMode) {
           handleSubmitEdit();
         } else {

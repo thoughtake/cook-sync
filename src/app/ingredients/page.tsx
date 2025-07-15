@@ -1,6 +1,7 @@
 "use client";
 
 import IngredientForm from "@/components/IngredientForm";
+import IngredientList from "@/components/IngredientList";
 import { Ingredient, IngredientGroup, Unit } from "@/types/indes";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -28,7 +29,7 @@ const IngredientsPage = () => {
     null
   );
 
-    // 材料の登録ID
+  // 材料の登録ID
   const nextId = useRef<number>(0);
 
   // 単位の候補
@@ -87,7 +88,6 @@ const IngredientsPage = () => {
     );
   }, [inputName, selectedUnitId, selectedGroupId]);
 
-
   //フォームの送信（保存）
   const handleSubmitSave = () => {
     //編集モードでないこと
@@ -115,7 +115,6 @@ const IngredientsPage = () => {
     //材料用のIDを+
     nextId.current++;
   };
-
 
   //フォームの送信（編集）
   const handleSubmitEdit = () => {
@@ -182,12 +181,16 @@ const IngredientsPage = () => {
     const stored = localStorage.getItem("ingredients");
     if (stored) {
       try {
-        const parsed = JSON.parse(stored)
+        const parsed = JSON.parse(stored);
         setIngredients(parsed);
 
-        const maxId = parsed.length > 0 ? Math.max(...parsed.map((ingredient: Ingredient) => ingredient.id)) + 1 : 0;
+        const maxId =
+          parsed.length > 0
+            ? Math.max(
+                ...parsed.map((ingredient: Ingredient) => ingredient.id)
+              ) + 1
+            : 0;
         nextId.current = maxId;
-
       } catch (err) {
         console.error("データの取得に失敗", err);
       }
@@ -239,41 +242,14 @@ const IngredientsPage = () => {
         isEditMode={isEditMode}
         isDisabled={isDisabled}
       />
-      <ul>
-        {ingredients.map((ingredient) => {
-          const groupName = ingredientGroup.find(
-            (group) => group.id === ingredient.ingredientGroupId
-          )?.name;
-          const unitName = units.find(
-            (unit) => unit.id === ingredient.unitId
-          )?.name;
-
-          return (
-            <li key={ingredient.id}>
-              {ingredient.id}
-              <span>{ingredient.name}</span>
-              <span>{groupName}</span>
-              <span>{unitName}</span>
-              <span>
-                {ingredient.pricePerUnit &&
-                  `1${unitName}あたり${ingredient.pricePerUnit}円`}
-              </span>
-              <button
-                onClick={() => handleEditStart(ingredient.id)}
-                className={`bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer font-bold ${isEditMode ? "hidden" : "visible"}`}
-              >
-                編集
-              </button>
-              <button
-                onClick={() => handleDelete(ingredient.id)}
-                className={`bg-red-500 text-white px-4 py-2 rounded hover:cursor-pointer font-bold ${isEditMode ? "hidden" : "visible"}`}
-              >
-                削除
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <IngredientList
+        ingredients={ingredients}
+        ingredientGroup={ingredientGroup}
+        units={units}
+        isEditMode={isEditMode}
+        handleEditStart={handleEditStart}
+        handleDelete={handleDelete}
+      />
     </>
   );
 };
