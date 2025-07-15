@@ -28,7 +28,7 @@ const IngredientsPage = () => {
     null
   );
 
-  // 材料の登録ID
+    // 材料の登録ID
   const nextId = useRef<number>(0);
 
   // 単位の候補
@@ -73,7 +73,6 @@ const IngredientsPage = () => {
   //[input]相場の状態を変更
   const handleChangePrice = (price: number | null) => {
     setInputPrice(price);
-    console.log("単位チェンジ");
   };
 
   // フォームを送れる状態かどうか
@@ -91,7 +90,6 @@ const IngredientsPage = () => {
 
   //フォームの送信（保存）
   const handleSubmitSave = () => {
-    console.log('保存');
     //編集モードでないこと
     if (selectedUnitId === null || selectedGroupId === null || isEditMode)
       return;
@@ -184,7 +182,12 @@ const IngredientsPage = () => {
     const stored = localStorage.getItem("ingredients");
     if (stored) {
       try {
-        setIngredients(JSON.parse(stored));
+        const parsed = JSON.parse(stored)
+        setIngredients(parsed);
+
+        const maxId = parsed.length > 0 ? Math.max(...parsed.map((ingredient: Ingredient) => ingredient.id)) + 1 : 0;
+        nextId.current = maxId;
+
       } catch (err) {
         console.error("データの取得に失敗", err);
       }
