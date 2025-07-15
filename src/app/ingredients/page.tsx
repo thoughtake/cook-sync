@@ -1,8 +1,8 @@
 "use client";
 
-import IngredientForm from "@/components/IngredientForm";
-import IngredientList from "@/components/IngredientList";
-import { Ingredient, IngredientGroup, Unit } from "@/types/indes";
+import IngredientsForm from "@/components/IngredientsForm";
+import IngredientsList from "@/components/IngredientsList";
+import { Ingredient, IngredientGroup, Unit } from "@/types/index";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const IngredientsPage = () => {
@@ -225,7 +225,7 @@ const IngredientsPage = () => {
   return (
     <>
       <h1>材料</h1>
-      <IngredientForm
+      <IngredientsForm
         inputName={inputName}
         inputPrice={inputPrice}
         setInputName={setInputName}
@@ -242,7 +242,7 @@ const IngredientsPage = () => {
         isEditMode={isEditMode}
         isDisabled={isDisabled}
       />
-      <IngredientList
+      <IngredientsList
         ingredients={ingredients}
         ingredientGroup={ingredientGroup}
         units={units}

@@ -1,4 +1,4 @@
-import { IngredientGroup, Unit } from "@/types/indes";
+import { IngredientGroup, Unit } from "@/types/index";
 
 //Propsの型指定
 type Props = {
@@ -19,8 +19,7 @@ type Props = {
   isDisabled: boolean;
 };
 
-const IngredientForm = (props: Props) => {
-
+const IngredientsForm = (props: Props) => {
   //Propsを代入
   const {
     inputName,
@@ -82,6 +81,7 @@ const IngredientForm = (props: Props) => {
           onChange={(e) =>
             handleSelectGroupId(e.target.value ? Number(e.target.value) : null)
           }
+          className="border"
         >
           <option value="">選択してください</option>
           {ingredientGroup.map((group: IngredientGroup) => (
@@ -102,6 +102,7 @@ const IngredientForm = (props: Props) => {
           onChange={(e) =>
             handleSelectUnitId(e.target.value ? Number(e.target.value) : null)
           }
+          className="border"
         >
           <option value="">選択してください</option>
           {units.map((unit: Unit) => (
@@ -161,4 +162,4 @@ const IngredientForm = (props: Props) => {
   );
 };
 
-export default IngredientForm;
+export default IngredientsForm;
