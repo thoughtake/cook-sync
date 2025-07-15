@@ -91,7 +91,7 @@ const IngredientForm = (props: Props) => {
       <br />
 
       {/* //[input]相場 */}
-      <label className={`flex ${selectedUnitId ? "visible" : "hidden"}`}>
+      <label className={`flex ${selectedUnitId === null ? "hidden" : "visible"}`}>
         <span className="font-bold">{`${unitLabel}あたりの相場`}</span>
         <input
           type="text"
