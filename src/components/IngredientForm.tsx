@@ -5,6 +5,7 @@ type Props = {
     setInputName: React.Dispatch<React.SetStateAction<string>>;
     selectedGroupId: number | null;
     selectedUnitId: number | null;
+    selectedUnit: Unit | undefined;
     handleSelectGroupId: (groupId: number | null) => void;
     handleSelectUnitId: (unitId: number | null) => void;
     handleChangePrice: (price: number | null) => void;
@@ -18,12 +19,14 @@ type Props = {
 
 
 const IngredientForm = (props: Props) => {
+
   const {
     inputName,
     inputPrice,
     setInputName,
     selectedGroupId,
     selectedUnitId,
+    selectedUnit,
     handleSelectGroupId,
     handleSelectUnitId,
     handleChangePrice,
@@ -35,11 +38,15 @@ const IngredientForm = (props: Props) => {
     isDisabled,
   } = props;
 
+  const unitLabel = selectedUnit
+  ? `${selectedUnit.amountPerUnit}${selectedUnit.name}`
+  : "1単位"
+
   return (
     // フォーム
     <form onSubmit={(e) => {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmit();
       }} className="mb-5">
       <h2>{`材料を${isEditMode ? '編集' : '登録'}`}</h2>
 
@@ -58,7 +65,7 @@ const IngredientForm = (props: Props) => {
       {/* [select]分類 */}
       <label className="flex">
         <span className="font-bold">分類</span>
-        <select value={selectedGroupId ?? ""} onChange={e => handleSelectGroupId(e.target.value ? Number(e.target.value) : null)}>
+        <select name="group" value={selectedGroupId ?? ""} onChange={e => handleSelectGroupId(e.target.value ? Number(e.target.value) : null)}>
           <option value="">選択してください</option>
           {ingredientGroup.map((group: IngredientGroup) => (
             <option key={group.id} value={group.id}>
@@ -72,7 +79,7 @@ const IngredientForm = (props: Props) => {
       {/* [select]単位 */}
       <label className="flex">
         <span className="font-bold">単位</span>
-        <select value={selectedUnitId ?? ""} onChange={e => handleSelectUnitId(e.target.value ? Number(e.target.value) : null)}>
+        <select name="unit" value={selectedUnitId ?? ""} onChange={e => handleSelectUnitId(e.target.value ? Number(e.target.value) : null)}>
           <option value="">選択してください</option>
           {units.map((unit: Unit) => (
             <option key={unit.id} value={unit.id}>
@@ -84,8 +91,8 @@ const IngredientForm = (props: Props) => {
       <br />
 
       {/* //[input]相場 */}
-      <label className="flex">
-        <span className="font-bold">1単位あたりの相場</span>
+      <label className={`flex ${selectedUnitId ? "visible" : "hidden"}`}>
+        <span className="font-bold">{`${unitLabel}あたりの相場`}</span>
         <input
           type="text"
           value={inputPrice ?? ""}

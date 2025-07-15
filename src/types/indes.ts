@@ -7,6 +7,7 @@ export type User = {
 export type Unit = {
   id : number;
   name: "個" | "g";
+  amountPerUnit : number;
 }
 
 

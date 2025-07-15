@@ -32,13 +32,13 @@ const IngredientsPage = () => {
   const nextId = useRef<number>(0);
 
   // 単位の候補
-  const units: Unit[] = [
-    { id: 0, name: "個" },
-    { id: 1, name: "g" },
-  ];
+  const units: Unit[] = useMemo(() => [
+    { id: 0, name: "個", amountPerUnit: 1 },
+    { id: 1, name: "g", amountPerUnit: 100 },
+  ], []);
 
   //分類の候補
-  const ingredientGroup: IngredientGroup[] = [
+  const ingredientGroup: IngredientGroup[] = useMemo(() => [
     { id: 0, name: "野菜" },
     { id: 1, name: "肉" },
     { id: 2, name: "魚介類" },
@@ -52,7 +52,7 @@ const IngredientsPage = () => {
     { id: 10, name: "飲料・酒類" },
     { id: 11, name: "お菓子" },
     { id: 12, name: "その他" },
-  ];
+  ], []);
 
   //[select]単位の状態を変更
   const handleSelectUnitId = (unitId: number | null) => {
@@ -67,6 +67,7 @@ const IngredientsPage = () => {
   //[input]相場の状態を変更
   const handleChangePrice = (price: number | null) => {
     setInputPrice(price);
+    console.log('単位チェンジ');
   };
 
   // フォームを送れる状態かどうか
@@ -127,6 +128,10 @@ const IngredientsPage = () => {
     }
   };
 
+  const selectedUnit:Unit | undefined = useMemo(() => {
+    return units.find(unit => unit.id === selectedUnitId);
+  },[units, selectedUnitId])
+
   useEffect(() => {
     const stored = localStorage.getItem("ingredients");
     if (stored) {
@@ -170,6 +175,7 @@ const IngredientsPage = () => {
         setInputName={setInputName}
         selectedGroupId={selectedGroupId}
         selectedUnitId={selectedUnitId}
+        selectedUnit={selectedUnit}
         handleSubmit={handleSubmit}
         handleSelectGroupId={handleSelectGroupId}
         handleSelectUnitId={handleSelectUnitId}
@@ -191,6 +197,7 @@ const IngredientsPage = () => {
 
           return (
             <li key={ingredient.id}>
+              {ingredient.id}
               <span>{ingredient.name}</span>
               <span>{groupName}</span>
               <span>{unitName}</span>
