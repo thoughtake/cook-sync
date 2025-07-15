@@ -2,26 +2,42 @@
 
 import IngredientForm from "@/components/IngredientForm";
 import { Ingredient, IngredientGroup, Unit } from "@/types/indes";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const IngredientsPage = () => {
+  //材料
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
+  //[input]材料名
   const [inputName, setInputName] = useState<string>("");
+
+  //[select]単位
   const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
+
+  //[select]分類
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
-  const [inputPrice, setInputPrice] = useState<string>("");
 
+  //[input]相場
+  const [inputPrice, setInputPrice] = useState<number | null>(null);
+
+  //編集中かどうか
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [editIngredientId, setEditIngredientId] = useState<number | null>(null);
 
+  //編集中の材料ID
+  const [editingIngredientId, setEditIngredientId] = useState<number | null>(
+    null
+  );
+
+  // 材料の登録ID
   const nextId = useRef<number>(0);
 
+  // 単位の候補
   const units: Unit[] = [
     { id: 0, name: "個" },
     { id: 1, name: "g" },
   ];
 
+  //分類の候補
   const ingredientGroup: IngredientGroup[] = [
     { id: 0, name: "野菜" },
     { id: 1, name: "肉" },
@@ -38,29 +54,40 @@ const IngredientsPage = () => {
     { id: 12, name: "その他" },
   ];
 
-  const handleSelectUnitId = (unitId: number) => {
+  //[select]単位の状態を変更
+  const handleSelectUnitId = (unitId: number | null) => {
     setSelectedUnitId(unitId);
   };
 
-  const handleSelectGroupId = (groupId: number) => {
+  //[select]分類の状態を変更
+  const handleSelectGroupId = (groupId: number | null) => {
     setSelectedGroupId(groupId);
   };
 
-  const handleChangePrice = (price: string) => {
-    if (/^[0-9]*$/.test(price)) {
-      setInputPrice(price);
-    }
+  //[input]相場の状態を変更
+  const handleChangePrice = (price: number | null) => {
+    setInputPrice(price);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (
+  // フォームを送れる状態かどうか
+  const isDisabled: boolean = useMemo(() => {
+    return (
+      // [input]材料名が入っているか
       !inputName.trim() ||
+      // [select]単位が選ばれているか
       selectedUnitId === null ||
+      // [select]分類が選ばれているか
       selectedGroupId === null ||
+      //編集モードではないか
       isEditMode
-    )
-      return;
+    );
+  }, [inputName, selectedUnitId, selectedGroupId, isEditMode]);
+
+  //フォームの送信
+  const handleSubmit = () => {
+    if (selectedUnitId === null || selectedGroupId === null) return;
+
+    // 新しい材料を作成
     const newIngredient = {
       id: nextId.current,
       name: inputName,
@@ -68,11 +95,17 @@ const IngredientsPage = () => {
       unitId: selectedUnitId,
       pricePerUnit: inputPrice ? Number(inputPrice) : undefined,
     };
+
+    //材料を更新
     setIngredients((prev) => [...prev, newIngredient]);
+
+    //フォームの内容をリセット
     setInputName("");
     setSelectedUnitId(null);
     setSelectedGroupId(null);
-    setInputPrice("");
+    setInputPrice(null);
+
+    //材料用のIDを+
     nextId.current++;
   };
 
@@ -81,8 +114,8 @@ const IngredientsPage = () => {
       setIsEditMode(true);
       setEditIngredientId(id);
     }
-    console.log(isEditMode)
-    console.log(editIngredientId)
+    console.log(isEditMode);
+    console.log(editingIngredientId);
   };
 
   const handleDelete = (id: number) => {
@@ -112,39 +145,40 @@ const IngredientsPage = () => {
   }, [ingredients]);
 
   useEffect(() => {
-    if (isEditMode && editIngredientId !== null) {
-      const editTarget = ingredients.find((i) => i.id === editIngredientId);
+    if (isEditMode && editingIngredientId !== null) {
+      const editTarget = ingredients.find((i) => i.id === editingIngredientId);
       if (editTarget) {
         setInputName(editTarget.name);
         setSelectedGroupId(editTarget.ingredientGroupId);
         setSelectedUnitId(editTarget.unitId);
-        setInputPrice(editTarget.pricePerUnit?.toString() ?? "");
+        setInputPrice(editTarget.pricePerUnit ?? null);
       }
     } else {
       setInputName("");
       setSelectedGroupId(null);
       setSelectedUnitId(null);
-      setInputPrice("");
+      setInputPrice(null);
     }
-  }, [isEditMode, editIngredientId, ingredients]);
+  }, [isEditMode, editingIngredientId, ingredients]);
 
   return (
     <>
       <h1>材料</h1>
       <IngredientForm
-        isEditMode={isEditMode}
-        editIngredientId={editIngredientId}
-        handleSubmit={handleSubmit}
         inputName={inputName}
+        inputPrice={inputPrice}
         setInputName={setInputName}
         selectedGroupId={selectedGroupId}
-        handleSelectGroup={handleSelectGroupId}
-        ingredientGroup={ingredientGroup}
         selectedUnitId={selectedUnitId}
-        handleSelectUnit={handleSelectUnitId}
-        units={units}
-        inputPrice={inputPrice}
+        handleSubmit={handleSubmit}
+        handleSelectGroupId={handleSelectGroupId}
+        handleSelectUnitId={handleSelectUnitId}
         handleChangePrice={handleChangePrice}
+        ingredientGroup={ingredientGroup}
+        units={units}
+        isEditMode={isEditMode}
+        editIngredientId={editingIngredientId}
+        isDisabled={isDisabled}
       />
       <ul>
         {ingredients.map((ingredient) => {
