@@ -32,27 +32,33 @@ const IngredientsPage = () => {
   const nextId = useRef<number>(0);
 
   // 単位の候補
-  const units: Unit[] = useMemo(() => [
-    { id: 0, name: "個", amountPerUnit: 1 },
-    { id: 1, name: "g", amountPerUnit: 100 },
-  ], []);
+  const units: Unit[] = useMemo(
+    () => [
+      { id: 0, name: "個", amountPerUnit: 1 },
+      { id: 1, name: "g", amountPerUnit: 100 },
+    ],
+    []
+  );
 
   //分類の候補
-  const ingredientGroup: IngredientGroup[] = useMemo(() => [
-    { id: 0, name: "野菜" },
-    { id: 1, name: "肉" },
-    { id: 2, name: "魚介類" },
-    { id: 3, name: "卵・乳製品" },
-    { id: 4, name: "大豆製品・豆類" },
-    { id: 5, name: "穀類・パン・麺類" },
-    { id: 6, name: "調味料・香辛料" },
-    { id: 7, name: "油・脂類" },
-    { id: 8, name: "果物" },
-    { id: 9, name: "きのこ・海藻" },
-    { id: 10, name: "飲料・酒類" },
-    { id: 11, name: "お菓子" },
-    { id: 12, name: "その他" },
-  ], []);
+  const ingredientGroup: IngredientGroup[] = useMemo(
+    () => [
+      { id: 0, name: "野菜" },
+      { id: 1, name: "肉" },
+      { id: 2, name: "魚介類" },
+      { id: 3, name: "卵・乳製品" },
+      { id: 4, name: "大豆製品・豆類" },
+      { id: 5, name: "穀類・パン・麺類" },
+      { id: 6, name: "調味料・香辛料" },
+      { id: 7, name: "油・脂類" },
+      { id: 8, name: "果物" },
+      { id: 9, name: "きのこ・海藻" },
+      { id: 10, name: "飲料・酒類" },
+      { id: 11, name: "お菓子" },
+      { id: 12, name: "その他" },
+    ],
+    []
+  );
 
   //[select]単位の状態を変更
   const handleSelectUnitId = (unitId: number | null) => {
@@ -67,7 +73,7 @@ const IngredientsPage = () => {
   //[input]相場の状態を変更
   const handleChangePrice = (price: number | null) => {
     setInputPrice(price);
-    console.log('単位チェンジ');
+    console.log("単位チェンジ");
   };
 
   // フォームを送れる状態かどうか
@@ -78,15 +84,17 @@ const IngredientsPage = () => {
       // [select]単位が選ばれているか
       selectedUnitId === null ||
       // [select]分類が選ばれているか
-      selectedGroupId === null ||
-      //編集モードではないか
-      isEditMode
+      selectedGroupId === null
     );
-  }, [inputName, selectedUnitId, selectedGroupId, isEditMode]);
+  }, [inputName, selectedUnitId, selectedGroupId]);
 
-  //フォームの送信
-  const handleSubmit = () => {
-    if (selectedUnitId === null || selectedGroupId === null) return;
+
+  //フォームの送信（保存）
+  const handleSubmitSave = () => {
+    console.log('保存');
+    //編集モードでないこと
+    if (selectedUnitId === null || selectedGroupId === null || isEditMode)
+      return;
 
     // 新しい材料を作成
     const newIngredient = {
@@ -94,7 +102,7 @@ const IngredientsPage = () => {
       name: inputName,
       ingredientGroupId: selectedGroupId,
       unitId: selectedUnitId,
-      pricePerUnit: inputPrice ? Number(inputPrice) : undefined,
+      pricePerUnit: inputPrice !== null ? inputPrice : undefined,
     };
 
     //材料を更新
@@ -110,15 +118,53 @@ const IngredientsPage = () => {
     nextId.current++;
   };
 
+
+  //フォームの送信（編集）
+  const handleSubmitEdit = () => {
+    //編集モードであること
+    if (
+      selectedUnitId === null ||
+      selectedGroupId === null ||
+      !isEditMode ||
+      editingIngredientId === null
+    )
+      return;
+
+    // 新しい材料を作成
+    const newIngredient = {
+      id: editingIngredientId,
+      name: inputName,
+      ingredientGroupId: selectedGroupId,
+      unitId: selectedUnitId,
+      pricePerUnit: inputPrice !== null ? inputPrice : undefined,
+    };
+
+    //材料を更新
+    setIngredients((prev) =>
+      prev.map((ingredient) =>
+        ingredient.id === editingIngredientId ? newIngredient : ingredient
+      )
+    );
+
+    //フォームの内容をリセット
+    setInputName("");
+    setSelectedUnitId(null);
+    setSelectedGroupId(null);
+    setInputPrice(null);
+
+    //編集モードを終了
+    setIsEditMode(false);
+  };
+
+  //編集モード
   const handleEditStart = (id: number) => {
     if (!isEditMode && id !== null) {
       setIsEditMode(true);
       setEditIngredientId(id);
     }
-    console.log(isEditMode);
-    console.log(editingIngredientId);
   };
 
+  //削除
   const handleDelete = (id: number) => {
     if (id && !isEditMode) {
       const newIngredients = ingredients.filter(
@@ -128,10 +174,12 @@ const IngredientsPage = () => {
     }
   };
 
-  const selectedUnit:Unit | undefined = useMemo(() => {
-    return units.find(unit => unit.id === selectedUnitId);
-  },[units, selectedUnitId])
+  //セレクトされている単位情報を取得
+  const selectedUnit: Unit | undefined = useMemo(() => {
+    return units.find((unit) => unit.id === selectedUnitId);
+  }, [units, selectedUnitId]);
 
+  //[初回]登録されている材料をストレージから取得
   useEffect(() => {
     const stored = localStorage.getItem("ingredients");
     if (stored) {
@@ -145,10 +193,12 @@ const IngredientsPage = () => {
     setIsEditMode(false);
   }, []);
 
+  //[材料が更新された時]材料をストレージに登録
   useEffect(() => {
     localStorage.setItem("ingredients", JSON.stringify(ingredients));
   }, [ingredients]);
 
+  //編集時にフォームに編集対象の情報を初期値としてセット
   useEffect(() => {
     if (isEditMode && editingIngredientId !== null) {
       const editTarget = ingredients.find((i) => i.id === editingIngredientId);
@@ -176,14 +226,14 @@ const IngredientsPage = () => {
         selectedGroupId={selectedGroupId}
         selectedUnitId={selectedUnitId}
         selectedUnit={selectedUnit}
-        handleSubmit={handleSubmit}
+        handleSubmitSave={handleSubmitSave}
+        handleSubmitEdit={handleSubmitEdit}
         handleSelectGroupId={handleSelectGroupId}
         handleSelectUnitId={handleSelectUnitId}
         handleChangePrice={handleChangePrice}
         ingredientGroup={ingredientGroup}
         units={units}
         isEditMode={isEditMode}
-        editIngredientId={editingIngredientId}
         isDisabled={isDisabled}
       />
       <ul>
@@ -207,13 +257,13 @@ const IngredientsPage = () => {
               </span>
               <button
                 onClick={() => handleEditStart(ingredient.id)}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer font-bold"
+                className={`bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer font-bold ${isEditMode ? "hidden" : "visible"}`}
               >
                 編集
               </button>
               <button
                 onClick={() => handleDelete(ingredient.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:cursor-pointer font-bold"
+                className={`bg-red-500 text-white px-4 py-2 rounded hover:cursor-pointer font-bold ${isEditMode ? "hidden" : "visible"}`}
               >
                 削除
               </button>
