@@ -3,7 +3,7 @@
 import IngredientsForm from "@/components/IngredientsForm";
 import IngredientsList from "@/components/IngredientsList";
 import { Ingredient, IngredientGroup, Unit } from "@/types/index";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const IngredientsPage = () => {
   //材料
@@ -28,9 +28,6 @@ const IngredientsPage = () => {
   const [editingIngredientId, setEditIngredientId] = useState<number | null>(
     null
   );
-
-  // 材料の登録ID
-  const nextId = useRef<number>(0);
 
   // 単位の候補
   const units: Unit[] = useMemo(
@@ -89,35 +86,52 @@ const IngredientsPage = () => {
   }, [inputName, selectedUnitId, selectedGroupId]);
 
   //フォームの送信（保存）
-  const handleSubmitSave = () => {
+  const handleSubmitSave = async () => {
     //編集モードでないこと
     if (selectedUnitId === null || selectedGroupId === null || isEditMode)
       return;
 
     // 新しい材料を作成
     const newIngredient = {
-      id: nextId.current,
+      // id: nextId.current,
       name: inputName,
       ingredientGroupId: selectedGroupId,
       unitId: selectedUnitId,
       pricePerUnit: inputPrice !== null ? inputPrice : undefined,
     };
 
-    //材料を更新
-    setIngredients((prev) => [...prev, newIngredient]);
+    try {
+      const res = await fetch("/api/ingredients", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newIngredient),
+      });
 
-    //フォームの内容をリセット
-    setInputName("");
-    setSelectedUnitId(null);
-    setSelectedGroupId(null);
-    setInputPrice(null);
+      const result = await res.json();
 
-    //材料用のIDを+
-    nextId.current++;
+      if (!res.ok) {
+        throw new Error(result.error || "登録に失敗しました。");
+      }
+
+      const getRes = await fetch("api/ingredients");
+      const data = await getRes.json();
+      setIngredients(data);
+
+      //フォームの内容をリセット
+      setInputName("");
+      setSelectedUnitId(null);
+      setSelectedGroupId(null);
+      setInputPrice(null);
+    } catch (error) {
+      alert("登録に失敗しました");
+      console.error(error);
+    }
   };
 
   //フォームの送信（編集）
-  const handleSubmitEdit = () => {
+  const handleSubmitEdit = async () => {
     //編集モードであること
     if (
       selectedUnitId === null ||
@@ -129,28 +143,44 @@ const IngredientsPage = () => {
 
     // 新しい材料を作成
     const newIngredient = {
-      id: editingIngredientId,
+      // id: editingIngredientId,
       name: inputName,
       ingredientGroupId: selectedGroupId,
       unitId: selectedUnitId,
       pricePerUnit: inputPrice !== null ? inputPrice : undefined,
     };
 
-    //材料を更新
-    setIngredients((prev) =>
-      prev.map((ingredient) =>
-        ingredient.id === editingIngredientId ? newIngredient : ingredient
-      )
-    );
+    try {
+      const res = await fetch(`/api/ingredients/${editingIngredientId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newIngredient),
+      });
 
-    //フォームの内容をリセット
-    setInputName("");
-    setSelectedUnitId(null);
-    setSelectedGroupId(null);
-    setInputPrice(null);
+      const result = await res.json();
 
-    //編集モードを終了
-    setIsEditMode(false);
+      if (!res.ok) {
+        throw new Error(result.error || "更新に失敗しました");
+      }
+
+      const getRes = await fetch("api/ingredients");
+      const data = await getRes.json();
+      setIngredients(data);
+
+      //フォームの内容をリセット
+      setInputName("");
+      setSelectedUnitId(null);
+      setSelectedGroupId(null);
+      setInputPrice(null);
+
+      //編集モードを終了
+      setIsEditMode(false);
+    } catch (error) {
+      alert("更新に失敗しました");
+      console.error(error);
+    }
   };
 
   //編集モード
@@ -162,12 +192,22 @@ const IngredientsPage = () => {
   };
 
   //削除
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (id && !isEditMode) {
-      const newIngredients = ingredients.filter(
-        (ingredient) => ingredient.id !== id
-      );
-      setIngredients(newIngredients);
+      try {
+        const res = await fetch(`/api/ingredients/${id}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) throw new Error("削除に失敗しました");
+
+        const getRes = await fetch("api/ingredients");
+        const data = await getRes.json();
+        setIngredients(data);
+      } catch (error) {
+        alert("削除に失敗しました");
+        console.error(error);
+      }
     }
   };
 
@@ -184,16 +224,8 @@ const IngredientsPage = () => {
       const res = await fetch("api/ingredients");
       const data = await res.json();
       setIngredients(data);
-
-      const maxId =
-        data.length > 0
-          ? Math.max(...data.map((ingredient: Ingredient) => ingredient.id)) + 1
-          : 0;
-      nextId.current = maxId;
     };
     try {
-      // const parsed = JSON.parse(stored);
-      // setIngredients(parsed);
       fetchIngredients();
     } catch (err) {
       console.error("データの取得に失敗", err);
@@ -202,11 +234,6 @@ const IngredientsPage = () => {
 
     setIsEditMode(false);
   }, []);
-
-  //[材料が更新された時]材料をストレージに登録
-  useEffect(() => {
-    localStorage.setItem("ingredients", JSON.stringify(ingredients));
-  }, [ingredients]);
 
   //編集時にフォームに編集対象の情報を初期値としてセット
   useEffect(() => {
