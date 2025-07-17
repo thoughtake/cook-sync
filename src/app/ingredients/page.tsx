@@ -1,8 +1,8 @@
 "use client";
 
-import IngredientsForm from "@/components/IngredientsForm";
-import IngredientsList from "@/components/IngredientsList";
-import { Ingredient, IngredientGroup, Unit } from "@/types/index";
+import IngredientsForm from "@/components/ingredients-form";
+import IngredientsList from "@/components/Ingredients-lists";
+import { Ingredient, IngredientGroup, ingredientGroupColors, Unit } from "@/types/index";
 import { useEffect, useMemo, useState } from "react";
 
 const IngredientsPage = () => {
@@ -34,6 +34,8 @@ const IngredientsPage = () => {
 
   //分類の候補
   const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>([]);
+
+  const [ingredientGroupColors, setIngredientGroupColors] = useState<ingredientGroupColors[]>([]);
 
   //[select]単位の状態を変更
   const handleSelectUnitId = (unitId: number | null) => {
@@ -205,7 +207,7 @@ const IngredientsPage = () => {
     try {
       fetchIngredients();
     } catch (err) {
-      console.error("ingredientsの取得に失敗", err);
+      console.error("材料の取得に失敗", err);
     }
 
     //単位を取得
@@ -217,19 +219,31 @@ const IngredientsPage = () => {
     try {
       fectchUnits();
     } catch (err) {
-      console.error("unitsの取得に失敗", err);
+      console.error("単位の取得に失敗", err);
     }
 
     //分類を取得
     const fetchIngredientGroups = async () => {
-      const res = await fetch('/api/ingredientGroups');
+      const res = await fetch('/api/ingredient-groups');
       const result = await res.json();
       setIngredientGroups(result);
     }
     try {
       fetchIngredientGroups();
     } catch (err) {
-      console.error("ingredientsGroupsの取得に失敗", err);
+      console.error("分類の取得に失敗", err);
+    }
+
+    //分類の色を取得
+    const fetchIngredientGroupColors = async () => {
+      const res = await fetch('api/ingredient-group-colors');
+      const result = await res.json();
+      setIngredientGroupColors(result);
+    }
+    try {
+      fetchIngredientGroupColors();
+    } catch (err) {
+      console.error("分類色の取得に失敗", err);
     }
 
     setIsEditMode(false);
@@ -255,7 +269,6 @@ const IngredientsPage = () => {
 
   return (
     <>
-      <h1>材料</h1>
       <IngredientsForm
         inputName={inputName}
         inputPrice={inputPrice}
@@ -276,6 +289,7 @@ const IngredientsPage = () => {
       <IngredientsList
         ingredients={ingredients}
         ingredientGroups={ingredientGroups}
+        ingredientGroupColors = {ingredientGroupColors}
         units={units}
         isEditMode={isEditMode}
         handleEditStart={handleEditStart}

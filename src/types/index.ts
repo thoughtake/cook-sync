@@ -16,12 +16,18 @@ export type Ingredient = {
   name: string;
   ingredientGroupId: number;
   unitId: number;
-  pricePerUnit?: number; 
+  pricePerUnit: number; 
 }
 
 export type IngredientGroup = {
   id: number;
   name: string;
+}
+
+export type ingredientGroupColors = {
+  id: number;
+  ingredientGroupId: number;
+  colorCode: string, 
 }
 
 export type DishIngredient = {

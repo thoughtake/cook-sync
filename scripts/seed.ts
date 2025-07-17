@@ -1,67 +1,114 @@
 import { initDb } from "@/db/initDb";
-import { units, ingredientGroups, ingredients } from "@/db/schema";
+import {
+  units,
+  ingredientGroups,
+  ingredients,
+  ingredientGroupColors,
+} from "@/db/schema";
 
 async function seed() {
   const db = await initDb();
 
   console.log("Seeding started...");
 
-const existingIngredients = await db.select().from(ingredients);
-if (existingIngredients.length === 0) {
-  await db.insert(ingredients).values([
-    { name: "にんじん", ingredientGroupId: 1, unitId: 2, pricePerUnit: 35 },
-    { name: "玉ねぎ", ingredientGroupId: 1, unitId: 2, pricePerUnit: 28 },
-    { name: "じゃがいも", ingredientGroupId: 1, unitId: 2, pricePerUnit: 40 },
-    { name: "キャベツ", ingredientGroupId: 1, unitId: 2, pricePerUnit: 25 },
-    { name: "きゅうり", ingredientGroupId: 1, unitId: 1, pricePerUnit: 45 },
-    { name: "トマト", ingredientGroupId: 1, unitId: 1, pricePerUnit: 60 },
-    { name: "レタス", ingredientGroupId: 1, unitId: 2, pricePerUnit: 30 },
-    { name: "ブロッコリー", ingredientGroupId: 1, unitId: 1, pricePerUnit: 120 },
-    { name: "鶏むね肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 78 },
-    { name: "鶏もも肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 98 },
-    { name: "豚バラ肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 120 },
-    { name: "豚こま切れ", ingredientGroupId: 2, unitId: 2, pricePerUnit: 105 },
-    { name: "牛こま切れ", ingredientGroupId: 2, unitId: 2, pricePerUnit: 180 },
-    { name: "牛ひき肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 160 },
-    { name: "卵", ingredientGroupId: 4, unitId: 1, pricePerUnit: 25 },
-    { name: "牛乳", ingredientGroupId: 4, unitId: 3, pricePerUnit: 80 },
-    { name: "ヨーグルト", ingredientGroupId: 4, unitId: 3, pricePerUnit: 70 },
-    { name: "豆腐", ingredientGroupId: 5, unitId: 1, pricePerUnit: 45 },
-    { name: "納豆", ingredientGroupId: 5, unitId: 1, pricePerUnit: 35 },
-    { name: "油揚げ", ingredientGroupId: 5, unitId: 1, pricePerUnit: 40 },
-    { name: "白米", ingredientGroupId: 6, unitId: 2, pricePerUnit: 55 },
-    { name: "食パン", ingredientGroupId: 6, unitId: 1, pricePerUnit: 35 },
-    { name: "うどん", ingredientGroupId: 6, unitId: 2, pricePerUnit: 48 },
-    { name: "パスタ", ingredientGroupId: 6, unitId: 2, pricePerUnit: 58 },
-    { name: "しょうゆ", ingredientGroupId: 7, unitId: 3, pricePerUnit: 25 },
-    { name: "みりん", ingredientGroupId: 7, unitId: 3, pricePerUnit: 30 },
-    { name: "料理酒", ingredientGroupId: 7, unitId: 3, pricePerUnit: 28 },
-    { name: "砂糖", ingredientGroupId: 7, unitId: 2, pricePerUnit: 20 },
-    { name: "塩", ingredientGroupId: 7, unitId: 2, pricePerUnit: 10 },
-    { name: "こしょう", ingredientGroupId: 7, unitId: 2, pricePerUnit: 60 },
-    { name: "サラダ油", ingredientGroupId: 8, unitId: 3, pricePerUnit: 35 },
-    { name: "オリーブオイル", ingredientGroupId: 8, unitId: 3, pricePerUnit: 55 },
-    { name: "バター", ingredientGroupId: 8, unitId: 2, pricePerUnit: 90 },
-    { name: "りんご", ingredientGroupId: 9, unitId: 1, pricePerUnit: 100 },
-    { name: "バナナ", ingredientGroupId: 9, unitId: 1, pricePerUnit: 35 },
-    { name: "ぶどう", ingredientGroupId: 9, unitId: 2, pricePerUnit: 85 },
-    { name: "しいたけ", ingredientGroupId: 10, unitId: 1, pricePerUnit: 50 },
-    { name: "しめじ", ingredientGroupId: 10, unitId: 1, pricePerUnit: 60 },
-    { name: "わかめ", ingredientGroupId: 10, unitId: 2, pricePerUnit: 45 },
-    { name: "水", ingredientGroupId: 11, unitId: 3, pricePerUnit: 10 },
-    { name: "お茶", ingredientGroupId: 11, unitId: 3, pricePerUnit: 15 },
-    { name: "ビール", ingredientGroupId: 11, unitId: 3, pricePerUnit: 90 },
-    { name: "チョコレート", ingredientGroupId: 12, unitId: 2, pricePerUnit: 95 },
-    { name: "クッキー", ingredientGroupId: 12, unitId: 1, pricePerUnit: 40 },
-    { name: "アイスクリーム", ingredientGroupId: 12, unitId: 1, pricePerUnit: 120 },
-    { name: "インスタントラーメン", ingredientGroupId: 13, unitId: 1, pricePerUnit: 110 },
-    { name: "冷凍炒飯", ingredientGroupId: 13, unitId: 2, pricePerUnit: 80 },
-    { name: "レトルトカレー", ingredientGroupId: 13, unitId: 1, pricePerUnit: 130 },
-    { name: "もやし", ingredientGroupId: 1, unitId: 2, pricePerUnit: 15 },
-  ]);
-  console.log("Ingredients seeded");
-}
+  //材料
+  const existingIngredients = await db.select().from(ingredients);
+  if (existingIngredients.length === 0) {
+    await db.insert(ingredients).values([
+      { name: "にんじん", ingredientGroupId: 1, unitId: 2, pricePerUnit: 35 },
+      { name: "玉ねぎ", ingredientGroupId: 1, unitId: 2, pricePerUnit: 28 },
+      { name: "じゃがいも", ingredientGroupId: 1, unitId: 2, pricePerUnit: 40 },
+      { name: "キャベツ", ingredientGroupId: 1, unitId: 2, pricePerUnit: 25 },
+      { name: "きゅうり", ingredientGroupId: 1, unitId: 1, pricePerUnit: 45 },
+      { name: "トマト", ingredientGroupId: 1, unitId: 1, pricePerUnit: 60 },
+      { name: "レタス", ingredientGroupId: 1, unitId: 2, pricePerUnit: 30 },
+      {
+        name: "ブロッコリー",
+        ingredientGroupId: 1,
+        unitId: 1,
+        pricePerUnit: 120,
+      },
+      { name: "鶏むね肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 78 },
+      { name: "鶏もも肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 98 },
+      { name: "豚バラ肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 120 },
+      {
+        name: "豚こま切れ",
+        ingredientGroupId: 2,
+        unitId: 2,
+        pricePerUnit: 105,
+      },
+      {
+        name: "牛こま切れ",
+        ingredientGroupId: 2,
+        unitId: 2,
+        pricePerUnit: 180,
+      },
+      { name: "牛ひき肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 160 },
+      { name: "卵", ingredientGroupId: 4, unitId: 1, pricePerUnit: 25 },
+      { name: "牛乳", ingredientGroupId: 4, unitId: 3, pricePerUnit: 80 },
+      { name: "ヨーグルト", ingredientGroupId: 4, unitId: 3, pricePerUnit: 70 },
+      { name: "豆腐", ingredientGroupId: 5, unitId: 1, pricePerUnit: 45 },
+      { name: "納豆", ingredientGroupId: 5, unitId: 1, pricePerUnit: 35 },
+      { name: "油揚げ", ingredientGroupId: 5, unitId: 1, pricePerUnit: 40 },
+      { name: "白米", ingredientGroupId: 6, unitId: 2, pricePerUnit: 55 },
+      { name: "食パン", ingredientGroupId: 6, unitId: 1, pricePerUnit: 35 },
+      { name: "うどん", ingredientGroupId: 6, unitId: 2, pricePerUnit: 48 },
+      { name: "パスタ", ingredientGroupId: 6, unitId: 2, pricePerUnit: 58 },
+      { name: "しょうゆ", ingredientGroupId: 7, unitId: 3, pricePerUnit: 25 },
+      { name: "みりん", ingredientGroupId: 7, unitId: 3, pricePerUnit: 30 },
+      { name: "料理酒", ingredientGroupId: 7, unitId: 3, pricePerUnit: 28 },
+      { name: "砂糖", ingredientGroupId: 7, unitId: 2, pricePerUnit: 20 },
+      { name: "塩", ingredientGroupId: 7, unitId: 2, pricePerUnit: 10 },
+      { name: "こしょう", ingredientGroupId: 7, unitId: 2, pricePerUnit: 60 },
+      { name: "サラダ油", ingredientGroupId: 8, unitId: 3, pricePerUnit: 35 },
+      {
+        name: "オリーブオイル",
+        ingredientGroupId: 8,
+        unitId: 3,
+        pricePerUnit: 55,
+      },
+      { name: "バター", ingredientGroupId: 8, unitId: 2, pricePerUnit: 90 },
+      { name: "りんご", ingredientGroupId: 9, unitId: 1, pricePerUnit: 100 },
+      { name: "バナナ", ingredientGroupId: 9, unitId: 1, pricePerUnit: 35 },
+      { name: "ぶどう", ingredientGroupId: 9, unitId: 2, pricePerUnit: 85 },
+      { name: "しいたけ", ingredientGroupId: 10, unitId: 1, pricePerUnit: 50 },
+      { name: "しめじ", ingredientGroupId: 10, unitId: 1, pricePerUnit: 60 },
+      { name: "わかめ", ingredientGroupId: 10, unitId: 2, pricePerUnit: 45 },
+      { name: "水", ingredientGroupId: 11, unitId: 3, pricePerUnit: 10 },
+      { name: "お茶", ingredientGroupId: 11, unitId: 3, pricePerUnit: 15 },
+      { name: "ビール", ingredientGroupId: 11, unitId: 3, pricePerUnit: 90 },
+      {
+        name: "チョコレート",
+        ingredientGroupId: 12,
+        unitId: 2,
+        pricePerUnit: 95,
+      },
+      { name: "クッキー", ingredientGroupId: 12, unitId: 1, pricePerUnit: 40 },
+      {
+        name: "アイスクリーム",
+        ingredientGroupId: 12,
+        unitId: 1,
+        pricePerUnit: 120,
+      },
+      {
+        name: "インスタントラーメン",
+        ingredientGroupId: 13,
+        unitId: 1,
+        pricePerUnit: 110,
+      },
+      { name: "冷凍炒飯", ingredientGroupId: 13, unitId: 2, pricePerUnit: 80 },
+      {
+        name: "レトルトカレー",
+        ingredientGroupId: 13,
+        unitId: 1,
+        pricePerUnit: 130,
+      },
+      { name: "もやし", ingredientGroupId: 1, unitId: 2, pricePerUnit: 15 },
+    ]);
+    console.log("Ingredients seeded");
+  }
 
+  // 単位
   const existingUnits = await db.select().from(units);
   if (existingUnits.length === 0) {
     await db.insert(units).values([
@@ -72,6 +119,7 @@ if (existingIngredients.length === 0) {
     console.log("Units seeded");
   }
 
+  //分類
   const existingGroups = await db.select().from(ingredientGroups);
   if (existingGroups.length === 0) {
     await db
@@ -92,6 +140,26 @@ if (existingIngredients.length === 0) {
         { name: "その他" },
       ]);
     console.log("Ingredient groups seeded");
+  }
+
+  const existingColors = await db.select().from(ingredientGroupColors);
+  if (existingColors.length === 0) {
+    await db.insert(ingredientGroupColors).values([
+      { ingredientGroupId: 1, colorCode: "#4CAF50" },
+      { ingredientGroupId: 2, colorCode: "#E57373" },
+      { ingredientGroupId: 3, colorCode: "#4FC3F7" },
+      { ingredientGroupId: 4, colorCode: "#FFF176" },
+      { ingredientGroupId: 5, colorCode: "#A1887F" },
+      { ingredientGroupId: 6, colorCode: "#FBC02D" },
+      { ingredientGroupId: 7, colorCode: "#FF8A65" },
+      { ingredientGroupId: 8, colorCode: "#FFD54F" },
+      { ingredientGroupId: 9, colorCode: "#FF7043" },
+      { ingredientGroupId: 10, colorCode: "#8D6E63" },
+      { ingredientGroupId: 11, colorCode: "#64B5F6" },
+      { ingredientGroupId: 12, colorCode: "#BA68C8" },
+      { ingredientGroupId: 13, colorCode: "#BDBDBD" },
+    ]);
+    console.log("Ingredient group colors seeded");
   }
 
   console.log("Seeding complete.");

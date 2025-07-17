@@ -18,3 +18,9 @@ export const ingredientGroups = mysqlTable('ingredient_groups', {
   id: serial('id').primaryKey(), 
   name: varchar('name', { length: 255 }).notNull(),
 });
+
+export const ingredientGroupColors = mysqlTable('ingredient_group_colors', {
+  id: serial('id').primaryKey(),
+  ingredientGroupId: int('ingredient_group_id').notNull(),
+  colorCode: varchar('color_code', { length: 7 }).notNull(), 
+});
