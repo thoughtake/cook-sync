@@ -3,7 +3,7 @@ import { memo } from "react";
 
 type Props = {
   ingredients: Ingredient[];
-  ingredientGroup: IngredientGroup[];
+  ingredientGroups: IngredientGroup[];
   units: Unit[];
   isEditMode: boolean;
   handleEditStart: (id: number) => void;
@@ -13,7 +13,7 @@ type Props = {
 const IngredientsList = (props: Props) => {
   const {
     ingredients,
-    ingredientGroup,
+    ingredientGroups,
     units,
     isEditMode,
     handleEditStart,
@@ -23,7 +23,7 @@ const IngredientsList = (props: Props) => {
   return (
     <ul>
       {ingredients.map((ingredient) => {
-        const groupName = ingredientGroup.find(
+        const groupName = ingredientGroups.find(
           (group) => group.id === ingredient.ingredientGroupId
         )?.name;
         const unitName = units.find(

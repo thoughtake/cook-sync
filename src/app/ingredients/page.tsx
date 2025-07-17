@@ -30,33 +30,10 @@ const IngredientsPage = () => {
   );
 
   // 単位の候補
-  const units: Unit[] = useMemo(
-    () => [
-      { id: 0, name: "個", amountPerUnit: 1 },
-      { id: 1, name: "g", amountPerUnit: 100 },
-    ],
-    []
-  );
+  const [units, setUnits] = useState<Unit[]>([]);
 
   //分類の候補
-  const ingredientGroup: IngredientGroup[] = useMemo(
-    () => [
-      { id: 0, name: "野菜" },
-      { id: 1, name: "肉" },
-      { id: 2, name: "魚介類" },
-      { id: 3, name: "卵・乳製品" },
-      { id: 4, name: "大豆製品・豆類" },
-      { id: 5, name: "穀類・パン・麺類" },
-      { id: 6, name: "調味料・香辛料" },
-      { id: 7, name: "油・脂類" },
-      { id: 8, name: "果物" },
-      { id: 9, name: "きのこ・海藻" },
-      { id: 10, name: "飲料・酒類" },
-      { id: 11, name: "お菓子" },
-      { id: 12, name: "その他" },
-    ],
-    []
-  );
+  const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>([]);
 
   //[select]単位の状態を変更
   const handleSelectUnitId = (unitId: number | null) => {
@@ -216,10 +193,10 @@ const IngredientsPage = () => {
     return units.find((unit) => unit.id === selectedUnitId);
   }, [units, selectedUnitId]);
 
-  //[初回]登録されている材料をストレージから取得
+
+  //[初回]
   useEffect(() => {
-    // const stored = localStorage.getItem("ingredients");
-    // if (stored) {
+    //材料を取得
     const fetchIngredients = async () => {
       const res = await fetch("api/ingredients");
       const data = await res.json();
@@ -228,9 +205,32 @@ const IngredientsPage = () => {
     try {
       fetchIngredients();
     } catch (err) {
-      console.error("データの取得に失敗", err);
+      console.error("ingredientsの取得に失敗", err);
     }
-    // }
+
+    //単位を取得
+    const fectchUnits = async () => {
+      const res = await fetch('/api/units');
+      const data = await res.json();
+      setUnits(data);
+    };
+    try {
+      fectchUnits();
+    } catch (err) {
+      console.error("unitsの取得に失敗", err);
+    }
+
+    //分類を取得
+    const fetchIngredientGroups = async () => {
+      const res = await fetch('/api/ingredientGroups');
+      const result = await res.json();
+      setIngredientGroups(result);
+    }
+    try {
+      fetchIngredientGroups();
+    } catch (err) {
+      console.error("ingredientsGroupsの取得に失敗", err);
+    }
 
     setIsEditMode(false);
   }, []);
@@ -268,14 +268,14 @@ const IngredientsPage = () => {
         handleSelectGroupId={handleSelectGroupId}
         handleSelectUnitId={handleSelectUnitId}
         handleChangePrice={handleChangePrice}
-        ingredientGroup={ingredientGroup}
+        ingredientGroups={ingredientGroups}
         units={units}
         isEditMode={isEditMode}
         isDisabled={isDisabled}
       />
       <IngredientsList
         ingredients={ingredients}
-        ingredientGroup={ingredientGroup}
+        ingredientGroups={ingredientGroups}
         units={units}
         isEditMode={isEditMode}
         handleEditStart={handleEditStart}

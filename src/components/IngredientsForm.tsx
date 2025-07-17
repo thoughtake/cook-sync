@@ -13,7 +13,7 @@ type Props = {
   handleChangePrice: (price: number | null) => void;
   handleSubmitSave: () => void;
   handleSubmitEdit: () => void;
-  ingredientGroup: IngredientGroup[];
+  ingredientGroups: IngredientGroup[];
   units: Unit[];
   isEditMode: boolean;
   isDisabled: boolean;
@@ -33,7 +33,7 @@ const IngredientsForm = (props: Props) => {
     handleChangePrice,
     handleSubmitSave,
     handleSubmitEdit,
-    ingredientGroup,
+    ingredientGroups,
     units,
     isEditMode,
     isDisabled,
@@ -84,7 +84,7 @@ const IngredientsForm = (props: Props) => {
           className="border"
         >
           <option value="">選択してください</option>
-          {ingredientGroup.map((group: IngredientGroup) => (
+          {ingredientGroups.map((group: IngredientGroup) => (
             <option key={group.id} value={group.id}>
               {group.name}
             </option>
