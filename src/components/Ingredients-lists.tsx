@@ -84,12 +84,8 @@ const IngredientsLists = () => {
 
   //クリックされたリストのIDを切り替え
   const handleClickedListId = (id: number) => {
-    if (id === null) return;
-    if (clickedListId === id) {
-      setClickedListId(null);
-    } else {
-      setClickedListId(id);
-    }
+    if (id === null || clickedListId === id) return;
+    setClickedListId(id);
   };
 
   //削除
@@ -187,7 +183,9 @@ const IngredientsLists = () => {
             }`}
           >
             <button
-              className={`absolute top-0 left-0 cursor-pointer w-full h-full rounded`}
+              className={`absolute top-0 left-0 cursor-pointer w-full h-full rounded ${
+                isClicked ? "pointer-events-none" : "pointer-events-auto"
+              }`}
               onClick={() => handleClickedListId(ingredient.id)}
             ></button>
             <div className="flex items-center">
@@ -217,7 +215,16 @@ const IngredientsLists = () => {
                   e.stopPropagation();
                   console.log(ingredient.id);
                   setEditingIngredientId(ingredient.id);
-                  showModal(<div></div>);
+                  showModal(
+                    <IngredientsForm
+                      ingredients={ingredients}
+                      setIngredients={setIngredients}
+                      editingIngredientId={editingIngredientId}
+                      setEditIngredientId={setEditingIngredientId}
+                      ingredientGroups={ingredientGroups}
+                      units={units}
+                    />
+                  );
                 }}
               />
               <IconButton
