@@ -10,50 +10,7 @@ import {
   Unit,
 } from "@/types";
 
-// type Props = {
-//   inputName: string;
-//   setInputName: React.Dispatch<React.SetStateAction<string>>;
-//   inputPrice: number | null;
-//   selectedGroupId: number | null;
-//   selectedUnitId: number | null;
-//   selectedUnit: Unit | undefined;
-//   handleSelectGroupId: (groupId: number | null) => void;
-//   handleSelectUnitId: (unitId: number | null) => void;
-//   handleChangePrice: (price: number | null) => void;
-//   handleSubmitSave: () => void;
-//   handleSubmitEdit: () => void;
-//   handleEditStart: (id: number) => void;
-//   handleDelete: (id: number) => void;
-//   isDisabled: boolean;
-//   ingredients: Ingredient[];
-//   ingredientGroups: IngredientGroup[];
-//   ingredientGroupColors: ingredientGroupColors[];
-//   units: Unit[];
-//   isEditMode: boolean;
-// };
-
 const IngredientsLists = () => {
-  // const {
-  //   inputName,
-  //   setInputName,
-  //   inputPrice,
-  //   selectedGroupId,
-  //   selectedUnitId,
-  //   selectedUnit,
-  //   handleSelectGroupId,
-  //   handleSelectUnitId,
-  //   handleChangePrice,
-  //   handleSubmitSave,
-  //   handleSubmitEdit,
-  //   handleEditStart,
-  //   handleDelete,
-  //   isDisabled,
-  //   ingredients,
-  //   ingredientGroups,
-  //   ingredientGroupColors,
-  //   units,
-  //   isEditMode,
-  // } = props;
 
   //材料
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -73,11 +30,6 @@ const IngredientsLists = () => {
 
   //クリックされたリストのID
   const [clickedListId, setClickedListId] = useState<number | null>(null);
-
-  //編集中の材料ID
-  const [editingIngredientId, setEditingIngredientId] = useState<number | null>(
-    null
-  );
 
   //モーダルcontextを使用
   const { showModal } = useModal();
@@ -213,14 +165,12 @@ const IngredientsLists = () => {
                 className="mr-3"
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log(ingredient.id);
-                  setEditingIngredientId(ingredient.id);
                   showModal(
                     <IngredientsForm
+                      targetId = {ingredient.id}
                       ingredients={ingredients}
                       setIngredients={setIngredients}
-                      editingIngredientId={editingIngredientId}
-                      setEditIngredientId={setEditingIngredientId}
+                      setClickedListId={setClickedListId}
                       ingredientGroups={ingredientGroups}
                       units={units}
                     />
