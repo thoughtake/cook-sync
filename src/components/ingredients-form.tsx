@@ -1,6 +1,5 @@
 import { IngredientGroup, Unit } from "@/types/index";
 
-//Propsの型指定
 type Props = {
   inputName: string;
   inputPrice: number | null;
@@ -18,6 +17,7 @@ type Props = {
   isEditMode: boolean;
   isDisabled: boolean;
 };
+
 
 const IngredientsForm = (props: Props) => {
   //Propsを代入
@@ -62,7 +62,7 @@ const IngredientsForm = (props: Props) => {
 
       {/* [input]材料名 */}
       <label className="flex">
-        <span className="font-bold">材料名</span>
+        <span className="font-bold">食材名</span>
         <input
           type="text"
           value={inputName}

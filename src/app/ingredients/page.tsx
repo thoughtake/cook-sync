@@ -1,6 +1,5 @@
 "use client";
 
-import IngredientsForm from "@/components/ingredients-form";
 import IngredientsList from "@/components/Ingredients-lists";
 import { Ingredient, IngredientGroup, ingredientGroupColors, Unit } from "@/types/index";
 import { useEffect, useMemo, useState } from "react";
@@ -269,7 +268,7 @@ const IngredientsPage = () => {
 
   return (
     <>
-      <IngredientsForm
+      {/* <IngredientsForm
         inputName={inputName}
         inputPrice={inputPrice}
         setInputName={setInputName}
@@ -285,15 +284,27 @@ const IngredientsPage = () => {
         units={units}
         isEditMode={isEditMode}
         isDisabled={isDisabled}
-      />
+      /> */}
       <IngredientsList
+        inputName={inputName}
+        inputPrice={inputPrice}
+        setInputName={setInputName}
+        selectedGroupId={selectedGroupId}
+        selectedUnitId={selectedUnitId}
+        selectedUnit={selectedUnit}
+        handleSubmitSave={handleSubmitSave}
+        handleSubmitEdit={handleSubmitEdit}
+        handleSelectGroupId={handleSelectGroupId}
+        handleSelectUnitId={handleSelectUnitId}
+        handleChangePrice={handleChangePrice}
+        handleEditStart={handleEditStart}
+        handleDelete={handleDelete}
+        isDisabled={isDisabled}
         ingredients={ingredients}
         ingredientGroups={ingredientGroups}
         ingredientGroupColors = {ingredientGroupColors}
         units={units}
         isEditMode={isEditMode}
-        handleEditStart={handleEditStart}
-        handleDelete={handleDelete}
       />
     </>
   );
