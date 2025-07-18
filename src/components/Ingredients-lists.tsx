@@ -3,7 +3,12 @@ import { Pencil, X } from "lucide-react";
 import IconButton from "./common/ui/icon-button";
 import { useModal } from "./context/modal-context";
 import IngredientsForm from "./ingredients-form";
-import { Ingredient, IngredientGroup, ingredientGroupColors, Unit } from "@/types";
+import {
+  Ingredient,
+  IngredientGroup,
+  ingredientGroupColors,
+  Unit,
+} from "@/types";
 
 type Props = {
   inputName: string;
@@ -27,29 +32,27 @@ type Props = {
   isEditMode: boolean;
 };
 
-
 const IngredientsLists = (props: Props) => {
-
   const {
-  inputName,
-  setInputName,
-  inputPrice,
-  selectedGroupId,
-  selectedUnitId,
-  selectedUnit,
-  handleSelectGroupId,
-  handleSelectUnitId,
-  handleChangePrice,
-  handleSubmitSave,
-  handleSubmitEdit,
-  handleEditStart,
-  handleDelete,
-  isDisabled,
-  ingredients,
-  ingredientGroups,
-  ingredientGroupColors,
-  units,
-  isEditMode,
+    inputName,
+    setInputName,
+    inputPrice,
+    selectedGroupId,
+    selectedUnitId,
+    selectedUnit,
+    handleSelectGroupId,
+    handleSelectUnitId,
+    handleChangePrice,
+    handleSubmitSave,
+    handleSubmitEdit,
+    handleEditStart,
+    handleDelete,
+    isDisabled,
+    ingredients,
+    ingredientGroups,
+    ingredientGroupColors,
+    units,
+    isEditMode,
   } = props;
 
   const [clickedListId, setClickedListId] = useState<number | null>(null);
@@ -82,45 +85,44 @@ const IngredientsLists = (props: Props) => {
         return (
           <li
             key={ingredient.id}
-            className={`mb-3 shadow-md  rounded ${
+            className={`flex items-center justify-between relative h-15 mb-3 p-3 shadow-md rounded ${
               isClicked
                 ? "outline-primary outline-3"
                 : "outline-border outline-1"
             }`}
           >
-            <div
-              role="button"
-              tabIndex={0}
-              className={`flex items-center justify-between cursor-pointer w-full h-15 p-3 rounded`}
+            <button
+              className={`absolute top-0 left-0 cursor-pointer w-full h-full rounded`}
               onClick={() => handleClickedListId(ingredient.id)}
-            >
-              <div className="flex items-center">
-                <div className="text-xl font-bold mr-4">{ingredient.name}</div>
-                <div
-                  style={{
-                    backgroundColor: `${groupColor ? groupColor : "inherit"}`,
-                  }}
-                  className="px-3 py-1 rounded mr-4"
-                >
-                  {groupName}
-                </div>
-                <div>
-                  {ingredient.pricePerUnit &&
-                    `1${unitName}あたり${ingredient.pricePerUnit}円`}
-                </div>
-              </div>
+            ></button>
+            <div className="flex items-center">
+              <div className="text-xl font-bold mr-4">{ingredient.name}</div>
               <div
-                className={`flex items-center ${
-                  isClicked ? "visible" : "hidden"
-                }`}
+                style={{
+                  backgroundColor: `${groupColor ? groupColor : "inherit"}`,
+                }}
+                className="px-3 py-1 rounded mr-4"
               >
-                <IconButton
-                  icon={Pencil}
-                  className="mr-3"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditStart(ingredient.id);
-                    showModal(<IngredientsForm 
+                {groupName}
+              </div>
+              <div>
+                {ingredient.pricePerUnit &&
+                  `1${unitName}あたり${ingredient.pricePerUnit}円`}
+              </div>
+            </div>
+            <div
+              className={`flex items-center ${
+                isClicked ? "visible" : "hidden"
+              }`}
+            >
+              <IconButton
+                icon={Pencil}
+                className="mr-3"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditStart(ingredient.id);
+                  showModal(
+                    <IngredientsForm
                       inputName={inputName}
                       inputPrice={inputPrice}
                       setInputName={setInputName}
@@ -136,19 +138,19 @@ const IngredientsLists = (props: Props) => {
                       units={units}
                       isEditMode={isEditMode}
                       isDisabled={isDisabled}
-                    />);
-                  }}
-                  isEditMode={isEditMode}
-                />
-                <IconButton
-                  icon={X}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(ingredient.id);
-                  }}
-                  isEditMode={isEditMode}
-                />
-              </div>
+                    />
+                  );
+                }}
+                isEditMode={isEditMode}
+              />
+              <IconButton
+                icon={X}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(ingredient.id);
+                }}
+                isEditMode={isEditMode}
+              />
             </div>
           </li>
         );
