@@ -22,7 +22,7 @@ const StandardButton = (props: Props) => {
       type={onClick ? "button" : "submit"}
       onClick={onClick}
       disabled={isDisabled}
-      className={`${bgColor} ${textColor}  ${className} my-3 px-4 py-2 rounded cursor-pointer hover:brightness-110 text-xl font-bold disabled:bg-gray-500 disabled:opacity-50`}
+      className={`${bgColor} ${textColor}  ${className} my-3 px-4 py-2 rounded cursor-pointer hover:brightness-110 text-xl font-bold disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-default disabled:brightness-100`}
     >
       {text}
     </button>

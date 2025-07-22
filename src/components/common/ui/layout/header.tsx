@@ -6,9 +6,13 @@ import { Plus } from "lucide-react";
 import IconButton from "../button/icon-button";
 import { useModal } from "@/components/context/modal-context";
 import IngredientsForm from "../ingredients/ingredients-form";
+import { useIngredientContext } from "@/components/context/ingredients-context";
 
 const Header = () => {
-  const {showModal} = useModal();
+  const { ingredients, setIngredients, ingredientGroups, units } =
+    useIngredientContext();
+
+  const { showModal } = useModal();
 
   return (
     <header className="bg-primary h-15">
@@ -22,23 +26,21 @@ const Header = () => {
               クックシンク
             </h1>
           </Link>
-          <IconButton 
+          <IconButton
             icon={Plus}
             bgColor="bg-inherit"
             className="border-2 rounded p-0.5"
             iconClassName="w-8 h-8"
             onClick={() => {
-              // showModal(
-              //   <IngredientsForm 
-              //       targetId = null
-              //       ingredients: Ingredient[];
-              //       setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-              //       // setClickedListId: React.Dispatch<React.SetStateAction<number | null>>;
-              //       ingredientGroups: IngredientGroup[];
-              //       units: Unit[];
-                
-              //   />
-              // )
+              showModal(
+                <IngredientsForm
+                  targetId={null}
+                  ingredients={ingredients}
+                  setIngredients={setIngredients}
+                  ingredientGroups={ingredientGroups}
+                  units={units}
+                />
+              );
             }}
           />
         </div>

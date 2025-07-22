@@ -61,9 +61,11 @@ const IngredientsForm = (props: Props) => {
       // [select]単位が選ばれているか
       selectedUnitId === null ||
       // [select]分類が選ばれているか
-      selectedGroupId === null
+      selectedGroupId === null ||
+      // [input]相場が入力されているか
+      inputPrice === null
     );
-  }, [inputName, selectedUnitId, selectedGroupId]);
+  }, [inputName, selectedUnitId, selectedGroupId ,inputPrice]);
 
   //セレクトされている単位情報を取得
   const selectedUnit: Unit | undefined = useMemo(() => {
@@ -291,7 +293,7 @@ const IngredientsForm = (props: Props) => {
               bgColor="bg-blue-500"
               textColor="text-white"
               isDisabled={isDisabled}
-              className="flex-1"
+              className="w-full"
             />
           )}
         </div>
