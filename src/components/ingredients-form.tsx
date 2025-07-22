@@ -1,5 +1,5 @@
 import { Ingredient, IngredientGroup, Unit } from "@/types/index";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import InputText from "./common/ui/input-text";
 import SelectBox from "./common/ui/select-box";
 import StandardButton from "./common/ui/standard-button";
@@ -9,15 +9,21 @@ type Props = {
   targetId: number | null;
   ingredients: Ingredient[];
   setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-  setClickedListId: React.Dispatch<React.SetStateAction<number | null>>;
+  // setClickedListId: React.Dispatch<React.SetStateAction<number | null>>;
   ingredientGroups: IngredientGroup[];
   units: Unit[];
 };
 
 const IngredientsForm = (props: Props) => {
   //Propsを代入
-  const { ingredients, setIngredients, targetId, ingredientGroups, units } =
-    props;
+  const {
+    ingredients,
+    setIngredients,
+    // setClickedListId,
+    targetId,
+    ingredientGroups,
+    units,
+  } = props;
 
   //[input]材料名
   const [inputName, setInputName] = useState<string>("");
@@ -72,12 +78,12 @@ const IngredientsForm = (props: Props) => {
     : "1単位";
 
   //フォームの内容をリセット
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setInputName("");
     setSelectedUnitId(null);
     setSelectedGroupId(null);
     setInputPrice(null);
-  };
+  }, [setInputName, setSelectedUnitId, setSelectedGroupId, setInputPrice]);
 
   //フォームの送信（保存）
   const handleSubmitSave = async () => {
@@ -117,11 +123,8 @@ const IngredientsForm = (props: Props) => {
       const data = await getRes.json();
       setIngredients(data);
 
-      //フォームの内容をリセット
-      setInputName("");
-      setSelectedUnitId(null);
-      setSelectedGroupId(null);
-      setInputPrice(null);
+      closeModal();
+      resetForm();
     } catch (error) {
       alert("登録に失敗しました");
       console.error(error);
@@ -166,7 +169,7 @@ const IngredientsForm = (props: Props) => {
       const data = await getRes.json();
       setIngredients(data);
 
-      //フォームの内容をリセット
+      closeModal();
       resetForm();
     } catch (error) {
       alert("更新に失敗しました");
@@ -193,7 +196,7 @@ const IngredientsForm = (props: Props) => {
       //フォームの内容をリセット
       resetForm();
     }
-  }, [targetId, ingredients]);
+  }, [targetId, ingredients, resetForm]);
 
   return (
     // フォーム
@@ -285,13 +288,13 @@ const IngredientsForm = (props: Props) => {
               />
             </div>
           ) : (
-            <button
-              type="submit"
-              disabled={isDisabled}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:cursor-pointer font-bold disabled:bg-gray-500 disabled:opacity-50"
-            >
-              登録
-            </button>
+            <StandardButton
+              text="登録"
+              bgColor="bg-blue-500"
+              textColor="text-white"
+              isDisabled={isDisabled}
+              className="flex-1"
+            />
           )}
         </div>
       </form>

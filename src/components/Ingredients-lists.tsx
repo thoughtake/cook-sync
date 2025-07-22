@@ -170,7 +170,7 @@ const IngredientsLists = () => {
                       targetId = {ingredient.id}
                       ingredients={ingredients}
                       setIngredients={setIngredients}
-                      setClickedListId={setClickedListId}
+                      // setClickedListId={setClickedListId}
                       ingredientGroups={ingredientGroups}
                       units={units}
                     />
