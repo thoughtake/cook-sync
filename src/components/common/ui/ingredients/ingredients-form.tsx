@@ -9,7 +9,6 @@ type Props = {
   targetId: number | null;
   ingredients: Ingredient[];
   setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-  // setClickedListId: React.Dispatch<React.SetStateAction<number | null>>;
   ingredientGroups: IngredientGroup[];
   units: Unit[];
 };
@@ -19,7 +18,6 @@ const IngredientsForm = (props: Props) => {
   const {
     ingredients,
     setIngredients,
-    // setClickedListId,
     targetId,
     ingredientGroups,
     units,

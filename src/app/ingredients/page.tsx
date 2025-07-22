@@ -1,34 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pencil, X } from "lucide-react";
-import {
-  Ingredient,
-  IngredientGroup,
-  ingredientGroupColors,
-  Unit,
-} from "@/types";
 import { useModal } from "@/components/context/modal-context";
 import IconButton from "@/components/common/ui/button/icon-button";
 import IngredientsForm from "@/components/common/ui/ingredients/ingredients-form";
 import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
+import { useIngredientContext } from "@/components/context/ingredients-context";
 
 const IngredientsPage = () => {
-  //材料
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-
-  //材料分類の色
-  const [ingredientGroupColors, setIngredientGroupColors] = useState<
-    ingredientGroupColors[]
-  >([]);
-
-  // 単位の候補
-  const [units, setUnits] = useState<Unit[]>([]);
-
-  //分類の候補
-  const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>(
-    []
-  );
+  const {
+    ingredients,
+    setIngredients,
+    ingredientGroups,
+    ingredientGroupColors,
+    units,
+  } = useIngredientContext();
 
   //クリックされたリストのID
   const [clickedListId, setClickedListId] = useState<number | null>(null);
@@ -63,65 +50,14 @@ const IngredientsPage = () => {
   };
 
   //削除確認
-  const handleDeleteConfirm = ({id, name}:{id: number, name: string}) => {
+  const handleDeleteConfirm = ({ id, name }: { id: number; name: string }) => {
     showModal(
-      <ModalConfirm 
+      <ModalConfirm
         message={`${name} を削除してよろしいですか？`}
         onConfirm={() => handleDelete(id)}
       />
-    )
-  }
-
-  //[初回]
-  useEffect(() => {
-    //材料を取得
-    const fetchIngredients = async () => {
-      const res = await fetch("api/ingredients");
-      const data = await res.json();
-      setIngredients(data);
-    };
-    try {
-      fetchIngredients();
-    } catch (err) {
-      console.error("材料の取得に失敗", err);
-    }
-
-    //単位を取得
-    const fetchUnits = async () => {
-      const res = await fetch("/api/units");
-      const data = await res.json();
-      setUnits(data);
-    };
-    try {
-      fetchUnits();
-    } catch (err) {
-      console.error("単位の取得に失敗", err);
-    }
-
-    //分類を取得
-    const fetchIngredientGroups = async () => {
-      const res = await fetch("/api/ingredient-groups");
-      const result = await res.json();
-      setIngredientGroups(result);
-    };
-    try {
-      fetchIngredientGroups();
-    } catch (err) {
-      console.error("分類の取得に失敗", err);
-    }
-
-    //分類の色を取得
-    const fetchIngredientGroupColors = async () => {
-      const res = await fetch("api/ingredient-group-colors");
-      const result = await res.json();
-      setIngredientGroupColors(result);
-    };
-    try {
-      fetchIngredientGroupColors();
-    } catch (err) {
-      console.error("分類色の取得に失敗", err);
-    }
-  }, []);
+    );
+  };
 
   return (
     <ul className="pt-5 pb-5">
@@ -178,7 +114,7 @@ const IngredientsPage = () => {
             >
               <IconButton
                 icon={Pencil}
-                className="mr-3"
+                className="mr-3 rounded-full  p-2.5"
                 onClick={(e) => {
                   e.stopPropagation();
                   showModal(
@@ -186,7 +122,6 @@ const IngredientsPage = () => {
                       targetId={ingredient.id}
                       ingredients={ingredients}
                       setIngredients={setIngredients}
-                      // setClickedListId={setClickedListId}
                       ingredientGroups={ingredientGroups}
                       units={units}
                     />
@@ -195,9 +130,13 @@ const IngredientsPage = () => {
               />
               <IconButton
                 icon={X}
+                className="rounded-full  p-2.5"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDeleteConfirm({id: ingredient.id, name: ingredient.name});
+                  handleDeleteConfirm({
+                    id: ingredient.id,
+                    name: ingredient.name,
+                  });
                 }}
               />
             </div>

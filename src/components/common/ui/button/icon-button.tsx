@@ -5,6 +5,7 @@ type Props = {
   bgColor?: string;
   textColor?: string;
   className?: string;
+  iconClassName?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
@@ -13,14 +14,15 @@ const IconButton = ({
   bgColor = "bg-primary",
   textColor = "text-text",
   className,
+  iconClassName = "w-4.5 h-4.5",
   onClick,
 }: Props) => {
   return (
     <button
       onClick={onClick}
-      className={`${bgColor} ${textColor} ${className} p-2.5 rounded-full hover:cursor-pointer font-bold`}
+      className={`${bgColor} ${textColor} ${className} hover:cursor-pointer`}
     >
-      <Icon className="w-4.5 h-4.5"/>
+      <Icon className={`${iconClassName}`}/>
     </button>
   );
 };
