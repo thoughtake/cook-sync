@@ -2,6 +2,8 @@ import { Ingredient, IngredientGroup, Unit } from "@/types/index";
 import { useEffect, useMemo, useState } from "react";
 import InputText from "./common/ui/input-text";
 import SelectBox from "./common/ui/select-box";
+import StandardButton from "./common/ui/standard-button";
+import { useModal } from "./context/modal-context";
 
 type Props = {
   targetId: number | null;
@@ -14,14 +16,8 @@ type Props = {
 
 const IngredientsForm = (props: Props) => {
   //Propsを代入
-  const {
-    ingredients,
-    setIngredients,
-    setClickedListId,
-    targetId,
-    ingredientGroups,
-    units,
-  } = props;
+  const { ingredients, setIngredients, targetId, ingredientGroups, units } =
+    props;
 
   //[input]材料名
   const [inputName, setInputName] = useState<string>("");
@@ -50,6 +46,9 @@ const IngredientsForm = (props: Props) => {
     setInputPrice(price);
   };
 
+  //モーダルcontext使用
+  const { closeModal } = useModal();
+
   // フォームを送れる状態かどうか
   const isDisabled: boolean = useMemo(() => {
     return (
@@ -71,6 +70,14 @@ const IngredientsForm = (props: Props) => {
   const unitLabel = selectedUnit
     ? `${selectedUnit.amountPerUnit}${selectedUnit.name}`
     : "1単位";
+
+  //フォームの内容をリセット
+  const resetForm = () => {
+    setInputName("");
+    setSelectedUnitId(null);
+    setSelectedGroupId(null);
+    setInputPrice(null);
+  };
 
   //フォームの送信（保存）
   const handleSubmitSave = async () => {
@@ -160,15 +167,16 @@ const IngredientsForm = (props: Props) => {
       setIngredients(data);
 
       //フォームの内容をリセット
-      setInputName("");
-      setSelectedUnitId(null);
-      setSelectedGroupId(null);
-      setInputPrice(null);
-      setClickedListId(null);
+      resetForm();
     } catch (error) {
       alert("更新に失敗しました");
       console.error(error);
     }
+  };
+
+  const handleClickCancel = () => {
+    closeModal();
+    resetForm();
   };
 
   //編集時にフォームに編集対象の情報を初期値としてセット
@@ -182,10 +190,8 @@ const IngredientsForm = (props: Props) => {
         setInputPrice(editTarget.pricePerUnit ?? null);
       }
     } else {
-      setInputName("");
-      setSelectedGroupId(null);
-      setSelectedUnitId(null);
-      setInputPrice(null);
+      //フォームの内容をリセット
+      resetForm();
     }
   }, [targetId, ingredients]);
 
@@ -199,7 +205,7 @@ const IngredientsForm = (props: Props) => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          //編集中かどうかで処理をかえる
+          //編集IDがあるかどうかで処理をかえる
           if (targetId !== null) {
             handleSubmitEdit();
           } else {
@@ -210,34 +216,12 @@ const IngredientsForm = (props: Props) => {
       >
         {/* [input]材料名 */}
         <InputText
+          name="ingredient"
           label="食材名"
           value={inputName}
           isRequired={true}
           onChange={(e) => setInputName(e.target.value)}
         />
-
-        {/* [select]分類 */}
-        <label className="flex">
-          <span className="font-bold">分類</span>
-          <select
-            name="group"
-            value={selectedGroupId ?? ""}
-            onChange={(e) =>
-              handleSelectGroupId(
-                e.target.value ? Number(e.target.value) : null
-              )
-            }
-            className="border"
-          >
-            <option value="">選択してください</option>
-            {ingredientGroups.map((group: IngredientGroup) => (
-              <option key={group.id} value={group.id}>
-                {group.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <br />
         <SelectBox
           name="group"
           label="分類"
@@ -248,36 +232,23 @@ const IngredientsForm = (props: Props) => {
           }
           options={ingredientGroups}
         />
+        <SelectBox
+          name="unit"
+          label="単位"
+          value={selectedUnitId ?? ""}
+          isRequired={true}
+          onChange={(e) =>
+            handleSelectUnitId(e.target.value ? Number(e.target.value) : null)
+          }
+          options={units}
+        />
 
-        {/* [select]単位 */}
-        <label className="flex">
-          <span className="font-bold">単位</span>
-          <select
-            name="unit"
-            value={selectedUnitId ?? ""}
-            onChange={(e) =>
-              handleSelectUnitId(e.target.value ? Number(e.target.value) : null)
-            }
-            className="border"
-          >
-            <option value="">選択してください</option>
-            {units.map((unit: Unit) => (
-              <option key={unit.id} value={unit.id}>
-                {unit.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <br />
-
-        {/* //[input]相場 */}
-        <label
-          className={`flex ${selectedUnitId === null ? "hidden" : "visible"}`}
-        >
-          <span className="font-bold">{`${unitLabel}あたりの相場`}</span>
-          <input
-            type="text"
+        <div className={`${selectedUnitId === null ? "invisible" : "visible"}`}>
+          <InputText
+            name="相場"
+            label={`${unitLabel}あたりの相場`}
             value={inputPrice ?? ""}
+            isRequired={true}
             onChange={(e) => {
               const value = e.target.value;
               //半角数字以外は入力を受け付けない
@@ -289,38 +260,30 @@ const IngredientsForm = (props: Props) => {
                 }
               }
             }}
-            className="border ml-3"
+            suffix="円"
+            className="w-1/3 text-right"
           />
-        </label>
-        <InputText
-          label={`${unitLabel}あたりの相場`}
-          value={inputPrice ?? ""}
-          isRequired={true}
-          onChange={(e) => {
-            const value = e.target.value;
-            //半角数字以外は入力を受け付けない
-            if (/^[0-9]*$/.test(value)) {
-              if (value === "") {
-                handleChangePrice(null);
-              } else {
-                handleChangePrice(Number(value));
-              }
-            }
-          }}
-          suffix="円"
-          className="w-1/3"
-        />
+        </div>
 
         {/* 送信ボタン */}
-        <div className="">
+        <div>
           {targetId !== null ? (
-            <button
-              type="submit"
-              disabled={isDisabled}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer font-bold disabled:bg-gray-500 disabled:opacity-50"
-            >
-              編集
-            </button>
+            <div className="flex gap-4">
+              <StandardButton
+                text="編集"
+                bgColor="bg-green-600"
+                textColor="text-white"
+                isDisabled={isDisabled}
+                className="flex-1"
+              />
+              <StandardButton
+                text="キャンセル"
+                bgColor="bg-gray-400"
+                textColor="text-white"
+                className="flex-1"
+                onClick={handleClickCancel}
+              />
+            </div>
           ) : (
             <button
               type="submit"

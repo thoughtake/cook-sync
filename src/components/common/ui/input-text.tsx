@@ -1,4 +1,5 @@
 type Props = {
+  name: string;
   label: string;
   value: number | string;
   isRequired: boolean;
@@ -9,6 +10,7 @@ type Props = {
 
 const InputText = (props: Props) => {
   const {
+    name,
     label,
     value,
     isRequired,
@@ -18,9 +20,9 @@ const InputText = (props: Props) => {
   } = props;
 
   return (
-    <div className="mb-5">
+    <div className="mb-7">
       <label>
-        <div className="font-bold mb-3">
+        <div className="font-bold mb-2">
           <span className="mr-2">{label}</span>
           {isRequired && 
           <span className="bg-red-500 text-white px-2 py-1 rounded">必須</span>
@@ -28,11 +30,11 @@ const InputText = (props: Props) => {
         </div>
         <input
           type="text"
-          name="name"
+          name={name}
           value={value}
           required={isRequired}
           onChange={onChange}
-          className={`outline-border outline-3 rounded p-3 ${className}`}
+          className={`border-border border-3 rounded p-3 ${className}`}
         />
         {suffix &&
         <span className="font-bold ml-3">{suffix}</span>

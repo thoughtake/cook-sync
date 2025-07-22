@@ -2,25 +2,28 @@
 
 import { X } from "lucide-react";
 import { useModal } from "../context/modal-context";
-import { useEffect } from "react";
+import { useEffect} from "react";
 
 const Modal = () => {
   const { isOpen, closeModal, content } = useModal();
+  
 
   useEffect(() => {
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+
+      if (e.key === "Escape") {
         closeModal();
       }
     };
-    
+
     document.addEventListener("keydown", handleKeyDown);
-    
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [closeModal])
-  
+    };
+  }, [closeModal]);
+
   if (!isOpen) return null;
 
   return (
@@ -34,7 +37,7 @@ const Modal = () => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-right">
-          <button onClick={closeModal}>
+          <button onClick={closeModal} className="cursor-pointer">
             <X />
           </button>
         </div>
