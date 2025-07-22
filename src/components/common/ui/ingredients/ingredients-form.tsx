@@ -1,9 +1,9 @@
 import { Ingredient, IngredientGroup, Unit } from "@/types/index";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import InputText from "./common/ui/input-text";
-import SelectBox from "./common/ui/select-box";
-import StandardButton from "./common/ui/standard-button";
-import { useModal } from "./context/modal-context";
+import InputText from "../form/input-text";
+import SelectBox from "../form/select-box";
+import StandardButton from "../button/standard-button";
+import { useModal } from "../../../context/modal-context";
 
 type Props = {
   targetId: number | null;
@@ -281,7 +281,7 @@ const IngredientsForm = (props: Props) => {
               />
               <StandardButton
                 text="キャンセル"
-                bgColor="bg-gray-400"
+                bgColor="bg-cancel"
                 textColor="text-white"
                 className="flex-1"
                 onClick={handleClickCancel}

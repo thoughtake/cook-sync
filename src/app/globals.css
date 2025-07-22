@@ -17,6 +17,8 @@
   --color-primary: #FFCC33;
   --color-border: #d9d9d9;
   --color-text: #000000;
+  --color-attention: #fb2c36;
+  --color-cancel: #99a1af;
 }
 
 @theme inline {

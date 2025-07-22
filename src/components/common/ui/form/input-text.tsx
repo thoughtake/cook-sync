@@ -25,7 +25,7 @@ const InputText = (props: Props) => {
         <div className="font-bold mb-2">
           <span className="mr-2">{label}</span>
           {isRequired && 
-          <span className="bg-red-500 text-white px-2 py-1 rounded">必須</span>
+          <span className="bg-attention text-white px-2 py-1 rounded">必須</span>
           }
         </div>
         <input

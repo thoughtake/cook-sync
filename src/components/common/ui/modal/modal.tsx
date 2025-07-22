@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useModal } from "../context/modal-context";
+import { useModal } from "../../../context/modal-context";
 import { useCallback, useEffect, useRef } from "react";
 
 const Modal = () => {

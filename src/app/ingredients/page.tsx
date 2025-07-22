@@ -9,11 +9,11 @@ import {
   Unit,
 } from "@/types";
 import { useModal } from "@/components/context/modal-context";
-import IconButton from "@/components/common/ui/icon-button";
-import IngredientsForm from "@/components/ingredients-form";
+import IconButton from "@/components/common/ui/button/icon-button";
+import IngredientsForm from "@/components/common/ui/ingredients/ingredients-form";
+import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
 
 const IngredientsPage = () => {
-
   //材料
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
@@ -61,6 +61,16 @@ const IngredientsPage = () => {
       }
     }
   };
+
+  //削除確認
+  const handleDeleteConfirm = ({id, name}:{id: number, name: string}) => {
+    showModal(
+      <ModalConfirm 
+        message={`${name} を削除してよろしいですか？`}
+        onConfirm={() => handleDelete(id)}
+      />
+    )
+  }
 
   //[初回]
   useEffect(() => {
@@ -143,7 +153,9 @@ const IngredientsPage = () => {
               onClick={() => handleClickedListId(ingredient.id)}
             ></button>
             <div className="flex items-center">
+              {/* 食材名 */}
               <div className="text-xl font-bold mr-4">{ingredient.name}</div>
+              {/* 分類 */}
               <div
                 style={{
                   backgroundColor: `${groupColor ? groupColor : "inherit"}`,
@@ -152,11 +164,13 @@ const IngredientsPage = () => {
               >
                 {groupName}
               </div>
+              {/* 相場 */}
               <div>
                 {ingredient.pricePerUnit &&
                   `1${unitName}あたり${ingredient.pricePerUnit}円`}
               </div>
             </div>
+            {/* ボタン */}
             <div
               className={`flex items-center ${
                 isClicked ? "visible" : "hidden"
@@ -169,7 +183,7 @@ const IngredientsPage = () => {
                   e.stopPropagation();
                   showModal(
                     <IngredientsForm
-                      targetId = {ingredient.id}
+                      targetId={ingredient.id}
                       ingredients={ingredients}
                       setIngredients={setIngredients}
                       // setClickedListId={setClickedListId}
@@ -183,7 +197,7 @@ const IngredientsPage = () => {
                 icon={X}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDelete(ingredient.id);
+                  handleDeleteConfirm({id: ingredient.id, name: ingredient.name});
                 }}
               />
             </div>
