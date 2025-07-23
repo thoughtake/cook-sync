@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import Container from "@/components/common/ui/layout/container";
-import { ModalProvider } from "@/components/context/modal-context";
+import Container from "@/components/common/layout/container";
+import { ModalProvider } from "@/context/modal-context";
 import Modal from "@/components/common/ui/modal/modal";
-import Header from "@/components/common/ui/layout/header";
-import Footer from "@/components/common/ui/layout/footer";
-import { IngredientsProvider } from "@/components/context/ingredients-context";
+import Header from "@/components/common/layout/header";
+import Footer from "@/components/common/layout/footer";
+// import { IngredientsProvider } from "@/context/ingredients-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,14 +50,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white`}
       >
-        <IngredientsProvider>
-          <ModalProvider>
-            <Header />
-            <Container className={"pb-15"}>{children}</Container>
-            <Modal />
-            <Footer />
-          </ModalProvider>
-        </IngredientsProvider>
+        <ModalProvider>
+          <Header />
+          <Container className={"pb-15"}>{children}</Container>
+          <Modal />
+          <Footer />
+        </ModalProvider>
       </body>
     </html>
   );

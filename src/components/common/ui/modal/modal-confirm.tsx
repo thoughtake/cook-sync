@@ -1,4 +1,4 @@
-import { useModal } from "@/components/context/modal-context";
+import { useModal } from "@/context/modal-context";
 import StandardButton from "../button/standard-button";
 
 type Props = {
@@ -21,16 +21,16 @@ const ModalConfirm = (props: Props) => {
       <p className="text-center text-xl font-bold mb-5">{message}</p>
       <div className="flex gap-4">
         <StandardButton
-          text="キャンセル"
-          bgColor="bg-cancel"
-          textColor="text-white"
+          label="キャンセル"
+          variant="filled"
+          color="gray"
           className="flex-1"
           onClick={closeModal}
         />
         <StandardButton
-          text="OK"
-          bgColor="bg-attention"
-          textColor="text-white"
+          label="OK"
+          variant="filled"
+          color="red"
           className="flex-1"
           onClick={handleConfirm}
         />

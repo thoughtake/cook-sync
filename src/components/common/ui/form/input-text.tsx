@@ -1,9 +1,12 @@
+import clsx from "clsx";
+import { ComponentProps } from "react";
+
 type Props = {
   name: string;
   label: string;
   value: number | string;
   isRequired: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: ComponentProps<"input">["onChange"];
   suffix?: string;
   className?: string;
 };
@@ -24,9 +27,11 @@ const InputText = (props: Props) => {
       <label>
         <div className="font-bold mb-2">
           <span className="mr-2">{label}</span>
-          {isRequired && 
-          <span className="bg-attention text-white px-2 py-1 rounded">必須</span>
-          }
+          {isRequired && (
+            <span className="bg-attention text-white px-2 py-1 rounded">
+              必須
+            </span>
+          )}
         </div>
         <input
           type="text"
@@ -34,11 +39,9 @@ const InputText = (props: Props) => {
           value={value}
           required={isRequired}
           onChange={onChange}
-          className={`border-border border-3 rounded p-3 ${className}`}
+          className={clsx(className, "border-border border-3 rounded p-3")}
         />
-        {suffix &&
-        <span className="font-bold ml-3">{suffix}</span>
-        }
+        {suffix && <span className="font-bold ml-3">{suffix}</span>}
       </label>
     </div>
   );

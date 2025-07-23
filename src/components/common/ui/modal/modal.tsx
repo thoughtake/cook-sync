@@ -1,8 +1,9 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useModal } from "../../../context/modal-context";
-import { useCallback, useEffect, useRef } from "react";
+import { useModal } from "../../../../context/modal-context";
+import { Suspense, useCallback, useEffect, useRef } from "react";
+import ModalLoading from "./modal-loading";
 
 const Modal = () => {
   const { isOpen, closeModal, content } = useModal();
@@ -48,7 +49,7 @@ const Modal = () => {
             <X />
           </button>
         </div>
-        {content}
+        <Suspense fallback={<ModalLoading />}>{content}</Suspense>
       </div>
     </dialog>
   );

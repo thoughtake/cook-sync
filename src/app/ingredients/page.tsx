@@ -2,20 +2,22 @@
 
 import { useState } from "react";
 import { Pencil, X } from "lucide-react";
-import { useModal } from "@/components/context/modal-context";
+import { useModal } from "@/context/modal-context";
 import IconButton from "@/components/common/ui/button/icon-button";
-import IngredientsForm from "@/components/common/ui/ingredients/ingredients-form";
+import IngredientsForm from "@/components/ingredients/ingredients-form";
 import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
-import { useIngredientContext } from "@/components/context/ingredients-context";
+import clsx from "clsx";
+import useIngredients from "@/hooks/useIngredients";
+import useIngredientGroups from "@/hooks/useIngredientGroups";
+import useUnits from "@/hooks/useUnits";
+import useIngredientGroupColors from "@/hooks/useIngredientGroupColors";
 
 const IngredientsPage = () => {
-  const {
-    ingredients,
-    setIngredients,
-    ingredientGroups,
-    ingredientGroupColors,
-    units,
-  } = useIngredientContext();
+
+  const { ingredients, mutateIngredients } = useIngredients();
+  const { ingredientGroups}  =  useIngredientGroups();
+  const { ingredientGroupColors}  =  useIngredientGroupColors();
+  const { units } = useUnits()
 
   //クリックされたリストのID
   const [clickedListId, setClickedListId] = useState<number | null>(null);
@@ -36,15 +38,18 @@ const IngredientsPage = () => {
         const res = await fetch(`/api/ingredients/${id}`, {
           method: "DELETE",
         });
+        // const result = await res.json();
 
-        if (!res.ok) throw new Error("削除に失敗しました");
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "削除に失敗しました");
+        }
 
-        const getRes = await fetch("api/ingredients");
-        const data = await getRes.json();
-        setIngredients(data);
-      } catch (error) {
+        //GET
+        await mutateIngredients();
+      } catch (err) {
         alert("削除に失敗しました");
-        console.error(error);
+        console.error("削除エラー：", err, "ID：", id);
       }
     }
   };
@@ -71,16 +76,18 @@ const IngredientsPage = () => {
         const unitName = units.find(
           (unit) => unit.id === ingredient.unitId
         )?.name;
-        const isClicked: boolean = ingredient.id === clickedListId;
+        const isClicked = ingredient.id === clickedListId;
 
         return (
           <li
             key={ingredient.id}
-            className={`flex items-center justify-between relative h-15 mb-3 p-3 shadow-md rounded ${
-              isClicked
-                ? "outline-primary outline-3"
-                : "outline-border outline-1"
-            }`}
+            className={clsx(
+              "flex items-center justify-between relative h-15 mb-3 p-3 shadow-md rounded",
+              {
+                "outline-primary outline-3": isClicked,
+                "outline-border outline-1": !isClicked,
+              }
+            )}
           >
             <button
               className={`absolute top-0 left-0 cursor-pointer w-full h-full rounded ${
@@ -108,29 +115,31 @@ const IngredientsPage = () => {
             </div>
             {/* ボタン */}
             <div
-              className={`flex items-center ${
-                isClicked ? "visible" : "hidden"
-              }`}
+              className={clsx("flex items-center", {
+                visible: isClicked,
+                hidden: !isClicked,
+              })}
             >
               <IconButton
                 icon={Pencil}
-                className="mr-3 rounded-full  p-2.5"
+                className="mr-3"
+                variant="filled"
+                size="sm"
+                radius="circle"
                 onClick={(e) => {
                   e.stopPropagation();
                   showModal(
                     <IngredientsForm
                       targetId={ingredient.id}
-                      ingredients={ingredients}
-                      setIngredients={setIngredients}
-                      ingredientGroups={ingredientGroups}
-                      units={units}
                     />
                   );
                 }}
               />
               <IconButton
                 icon={X}
-                className="rounded-full  p-2.5"
+                variant="filled"
+                size="sm"
+                radius="circle"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteConfirm({

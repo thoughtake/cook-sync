@@ -3,14 +3,11 @@
 import Link from "next/link";
 import Container from "./container";
 import { Plus } from "lucide-react";
-import IconButton from "../button/icon-button";
-import { useModal } from "@/components/context/modal-context";
-import IngredientsForm from "../ingredients/ingredients-form";
-import { useIngredientContext } from "@/components/context/ingredients-context";
+import IconButton from "../ui/button/icon-button";
+import { useModal } from "@/context/modal-context";
+import IngredientsForm from "../../ingredients/ingredients-form";
 
 const Header = () => {
-  const { ingredients, setIngredients, ingredientGroups, units } =
-    useIngredientContext();
 
   const { showModal } = useModal();
 
@@ -28,17 +25,13 @@ const Header = () => {
           </Link>
           <IconButton
             icon={Plus}
-            bgColor="bg-inherit"
-            className="border-2 rounded p-0.5"
-            iconClassName="w-8 h-8"
+            variant="outline"
+            color="black"
+            size="lg"
             onClick={() => {
               showModal(
                 <IngredientsForm
                   targetId={null}
-                  ingredients={ingredients}
-                  setIngredients={setIngredients}
-                  ingredientGroups={ingredientGroups}
-                  units={units}
                 />
               );
             }}

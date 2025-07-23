@@ -1,11 +1,13 @@
+import clsx from "clsx";
 import { ChevronDown } from "lucide-react";
+import { ComponentProps } from "react";
 
 type Props = {
   name: string;
   label: string;
   value: number | string;
   isRequired: boolean;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onChange: ComponentProps<"select">["onChange"];
   options: { id: number; name: string }[];
   className?: string;
 };
@@ -33,22 +35,24 @@ const SelectBox = (props: Props) => {
           )}
         </div>
         <div className="relative">
-        <select
-          name={name}
-          value={value}
-          required={isRequired}
-          onChange={onChange}
-          className={`appearance-none border-border border-3 rounded p-3 ${className}`}
-        >
-          <option value="">選択してください</option>
-          {options.map((group: { id: number; name: string }) => (
-            <option key={group.id} value={group.id}>
-              {group.name}
-            </option>
-          ))}
-        </select>
+          <select
+            name={name}
+            value={value}
+            required={isRequired}
+            onChange={onChange}
+            className={clsx(
+              className,
+              "appearance-none border-border border-3 rounded p-3"
+            )}
+          >
+            <option value="">選択してください</option>
+            {options.map((group: { id: number; name: string }) => (
+              <option key={group.id} value={group.id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
           <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-
         </div>
       </label>
     </div>

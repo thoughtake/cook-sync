@@ -1,27 +1,22 @@
-import { Ingredient, IngredientGroup, Unit } from "@/types/index";
+import { Unit } from "@/types/index";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import InputText from "../form/input-text";
-import SelectBox from "../form/select-box";
-import StandardButton from "../button/standard-button";
-import { useModal } from "../../../context/modal-context";
+import InputText from "../common/ui/form/input-text";
+import SelectBox from "../common/ui/form/select-box";
+import StandardButton from "../common/ui/button/standard-button";
+import { useModal } from "../../context/modal-context";
+import useIngredients from "@/hooks/useIngredients";
+import useIngredientGroups from "@/hooks/useIngredientGroups";
+import useUnits from "@/hooks/useUnits";
 
 type Props = {
   targetId: number | null;
-  ingredients: Ingredient[];
-  setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
-  ingredientGroups: IngredientGroup[];
-  units: Unit[];
 };
 
 const IngredientsForm = (props: Props) => {
-  //Propsを代入
-  const {
-    ingredients,
-    setIngredients,
-    targetId,
-    ingredientGroups,
-    units,
-  } = props;
+  const { targetId } = props;
+  const { ingredients, mutateIngredients } = useIngredients();
+  const { ingredientGroups } = useIngredientGroups();
+  const { units } = useUnits();
 
   //[input]材料名
   const [inputName, setInputName] = useState<string>("");
@@ -65,7 +60,7 @@ const IngredientsForm = (props: Props) => {
       // [input]相場が入力されているか
       inputPrice === null
     );
-  }, [inputName, selectedUnitId, selectedGroupId ,inputPrice]);
+  }, [inputName, selectedUnitId, selectedGroupId, inputPrice]);
 
   //セレクトされている単位情報を取得
   const selectedUnit: Unit | undefined = useMemo(() => {
@@ -119,9 +114,8 @@ const IngredientsForm = (props: Props) => {
         throw new Error(result.error || "登録に失敗しました。");
       }
 
-      const getRes = await fetch("api/ingredients");
-      const data = await getRes.json();
-      setIngredients(data);
+      //取得
+      await mutateIngredients();
 
       closeModal();
       resetForm();
@@ -165,9 +159,8 @@ const IngredientsForm = (props: Props) => {
         throw new Error(result.error || "更新に失敗しました");
       }
 
-      const getRes = await fetch("api/ingredients");
-      const data = await getRes.json();
-      setIngredients(data);
+      //取得
+      await mutateIngredients();
 
       closeModal();
       resetForm();
@@ -273,25 +266,25 @@ const IngredientsForm = (props: Props) => {
           {targetId !== null ? (
             <div className="flex gap-4">
               <StandardButton
-                text="編集"
-                bgColor="bg-green-600"
-                textColor="text-white"
+                label="編集"
+                variant="filled"
+                color="green"
                 isDisabled={isDisabled}
                 className="flex-1"
               />
               <StandardButton
-                text="キャンセル"
-                bgColor="bg-cancel"
-                textColor="text-white"
+                label="キャンセル"
+                variant="filled"
+                color="gray"
                 className="flex-1"
                 onClick={handleClickCancel}
               />
             </div>
           ) : (
             <StandardButton
-              text="登録"
-              bgColor="bg-blue-500"
-              textColor="text-white"
+              label="登録"
+              variant="filled"
+              color="green"
               isDisabled={isDisabled}
               className="w-full"
             />
