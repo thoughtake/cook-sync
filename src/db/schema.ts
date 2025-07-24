@@ -7,7 +7,7 @@ import {
   foreignKey,
 } from "drizzle-orm/mysql-core";
 
-//食材
+//材料
 export const ingredients = mysqlTable("ingredients", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),

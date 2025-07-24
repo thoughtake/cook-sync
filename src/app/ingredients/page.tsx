@@ -13,11 +13,10 @@ import useUnits from "@/hooks/useUnits";
 import useIngredientGroupColors from "@/hooks/useIngredientGroupColors";
 
 const IngredientsPage = () => {
-
   const { ingredients, mutateIngredients } = useIngredients();
-  const { ingredientGroups}  =  useIngredientGroups();
-  const { ingredientGroupColors}  =  useIngredientGroupColors();
-  const { units } = useUnits()
+  const { ingredientGroups } = useIngredientGroups();
+  const { ingredientGroupColors } = useIngredientGroupColors();
+  const { units } = useUnits();
 
   //クリックされたリストのID
   const [clickedListId, setClickedListId] = useState<number | null>(null);
@@ -96,7 +95,7 @@ const IngredientsPage = () => {
               onClick={() => handleClickedListId(ingredient.id)}
             ></button>
             <div className="flex items-center">
-              {/* 食材名 */}
+              {/* 材料名 */}
               <div className="text-xl font-bold mr-4">{ingredient.name}</div>
               {/* 分類 */}
               <div
@@ -128,11 +127,7 @@ const IngredientsPage = () => {
                 radius="circle"
                 onClick={(e) => {
                   e.stopPropagation();
-                  showModal(
-                    <IngredientsForm
-                      targetId={ingredient.id}
-                    />
-                  );
+                  showModal(<IngredientsForm targetId={ingredient.id} />);
                 }}
               />
               <IconButton

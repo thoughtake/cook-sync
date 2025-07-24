@@ -213,7 +213,7 @@ const IngredientsForm = (props: Props) => {
         {/* [input]材料名 */}
         <InputText
           name="ingredient"
-          label="食材名"
+          label="材料名"
           value={inputName}
           isRequired={true}
           onChange={(e) => setInputName(e.target.value)}

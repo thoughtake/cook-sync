@@ -23,11 +23,25 @@ export type IngredientGroupColor = {
   colorCode: string;
 };
 
-export type Dishes = {
-    id: number;
-    name: string;
-    timeMinutes: number;
-    servings: number;
-    isFavorite: boolean;
-    imageUrl: string;
+export type Dish = {
+  id: number;
+  name: string;
+  timeMinutes: number;
+  servings: number;
+  isFavorite: boolean;
+  imageUrl?: string;
+};
+
+export type DishIngredient = {
+   id: number
+   dishId: number,
+   ingredientId: number,
+   quantity: "string", 
+}
+
+export type DishRecipe = {
+    id: number,
+    dishId: number,
+    stepNumber: number,
+    description: string,
 }

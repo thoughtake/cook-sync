@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import Container from "./container";
@@ -16,7 +16,7 @@ const Footer = () => {
               <Link href="/dishes">料理</Link>
             </li>
             <li>
-              <Link href="/ingredients">食材</Link>
+              <Link href="/ingredients">材料</Link>
             </li>
           </ul>
         </nav>
