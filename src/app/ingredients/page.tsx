@@ -65,7 +65,7 @@ const IngredientsPage = () => {
   };
 
   return (
-    <ul className="pt-5 pb-5">
+    <ul className="py-5">
       {ingredients.map((ingredient) => {
         const groupName = ingredientGroups.find(
           (group) => group.id === ingredient.ingredientGroupId
@@ -90,7 +90,7 @@ const IngredientsPage = () => {
             )}
           >
             <button
-              className={`absolute top-0 left-0 cursor-pointer w-full h-full rounded ${
+              className={`absolute top-0 left-0 cursor-pointer w-full h-full rounded z-2 ${
                 isClicked ? "pointer-events-none" : "pointer-events-auto"
               }`}
               onClick={() => handleClickedListId(ingredient.id)}
