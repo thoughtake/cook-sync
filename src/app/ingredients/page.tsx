@@ -1,186 +1,158 @@
 "use client";
 
-import IngredientForm from "@/components/IngredientForm";
-import { Ingredient, IngredientGroup, Unit } from "@/types/indes";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { Pencil, X } from "lucide-react";
+import { useModal } from "@/context/modal-context";
+import IconButton from "@/components/common/ui/button/icon-button";
+import IngredientsForm from "@/components/ingredients/ingredients-form";
+import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
+import clsx from "clsx";
+import useIngredients from "@/hooks/useIngredients";
+import useIngredientGroups from "@/hooks/useIngredientGroups";
+import useUnits from "@/hooks/useUnits";
+import useIngredientGroupColors from "@/hooks/useIngredientGroupColors";
 
 const IngredientsPage = () => {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
-  const [inputName, setInputName] = useState<string>("");
-  const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
-  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
-  const [inputPrice, setInputPrice] = useState<string>("");
+  const { ingredients, mutateIngredients } = useIngredients();
+  const { ingredientGroups}  =  useIngredientGroups();
+  const { ingredientGroupColors}  =  useIngredientGroupColors();
+  const { units } = useUnits()
 
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [editIngredientId, setEditIngredientId] = useState<number | null>(null);
+  //クリックされたリストのID
+  const [clickedListId, setClickedListId] = useState<number | null>(null);
 
-  const nextId = useRef<number>(0);
+  //モーダルcontextを使用
+  const { showModal } = useModal();
 
-  const units: Unit[] = [
-    { id: 0, name: "個" },
-    { id: 1, name: "g" },
-  ];
-
-  const ingredientGroup: IngredientGroup[] = [
-    { id: 0, name: "野菜" },
-    { id: 1, name: "肉" },
-    { id: 2, name: "魚介類" },
-    { id: 3, name: "卵・乳製品" },
-    { id: 4, name: "大豆製品・豆類" },
-    { id: 5, name: "穀類・パン・麺類" },
-    { id: 6, name: "調味料・香辛料" },
-    { id: 7, name: "油・脂類" },
-    { id: 8, name: "果物" },
-    { id: 9, name: "きのこ・海藻" },
-    { id: 10, name: "飲料・酒類" },
-    { id: 11, name: "お菓子" },
-    { id: 12, name: "その他" },
-  ];
-
-  const handleSelectUnitId = (unitId: number) => {
-    setSelectedUnitId(unitId);
+  //クリックされたリストのIDを切り替え
+  const handleClickedListId = (id: number) => {
+    if (id === null || clickedListId === id) return;
+    setClickedListId(id);
   };
 
-  const handleSelectGroupId = (groupId: number) => {
-    setSelectedGroupId(groupId);
-  };
-
-  const handleChangePrice = (price: string) => {
-    if (/^[0-9]*$/.test(price)) {
-      setInputPrice(price);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (
-      !inputName.trim() ||
-      selectedUnitId === null ||
-      selectedGroupId === null ||
-      isEditMode
-    )
-      return;
-    const newIngredient = {
-      id: nextId.current,
-      name: inputName,
-      ingredientGroupId: selectedGroupId,
-      unitId: selectedUnitId,
-      pricePerUnit: inputPrice ? Number(inputPrice) : undefined,
-    };
-    setIngredients((prev) => [...prev, newIngredient]);
-    setInputName("");
-    setSelectedUnitId(null);
-    setSelectedGroupId(null);
-    setInputPrice("");
-    nextId.current++;
-  };
-
-  const handleEditStart = (id: number) => {
-    if (!isEditMode && id !== null) {
-      setIsEditMode(true);
-      setEditIngredientId(id);
-    }
-    console.log(isEditMode)
-    console.log(editIngredientId)
-  };
-
-  const handleDelete = (id: number) => {
-    if (id && !isEditMode) {
-      const newIngredients = ingredients.filter(
-        (ingredient) => ingredient.id !== id
-      );
-      setIngredients(newIngredients);
-    }
-  };
-
-  useEffect(() => {
-    const stored = localStorage.getItem("ingredients");
-    if (stored) {
+  //削除
+  const handleDelete = async (id: number) => {
+    if (id) {
       try {
-        setIngredients(JSON.parse(stored));
+        const res = await fetch(`/api/ingredients/${id}`, {
+          method: "DELETE",
+        });
+        // const result = await res.json();
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "削除に失敗しました");
+        }
+
+        //GET
+        await mutateIngredients();
       } catch (err) {
-        console.error("データの取得に失敗", err);
+        alert("削除に失敗しました");
+        console.error("削除エラー：", err, "ID：", id);
       }
     }
+  };
 
-    setIsEditMode(false);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("ingredients", JSON.stringify(ingredients));
-  }, [ingredients]);
-
-  useEffect(() => {
-    if (isEditMode && editIngredientId !== null) {
-      const editTarget = ingredients.find((i) => i.id === editIngredientId);
-      if (editTarget) {
-        setInputName(editTarget.name);
-        setSelectedGroupId(editTarget.ingredientGroupId);
-        setSelectedUnitId(editTarget.unitId);
-        setInputPrice(editTarget.pricePerUnit?.toString() ?? "");
-      }
-    } else {
-      setInputName("");
-      setSelectedGroupId(null);
-      setSelectedUnitId(null);
-      setInputPrice("");
-    }
-  }, [isEditMode, editIngredientId, ingredients]);
+  //削除確認
+  const handleDeleteConfirm = ({ id, name }: { id: number; name: string }) => {
+    showModal(
+      <ModalConfirm
+        message={`${name} を削除してよろしいですか？`}
+        onConfirm={() => handleDelete(id)}
+      />
+    );
+  };
 
   return (
-    <>
-      <h1>材料</h1>
-      <IngredientForm
-        isEditMode={isEditMode}
-        editIngredientId={editIngredientId}
-        handleSubmit={handleSubmit}
-        inputName={inputName}
-        setInputName={setInputName}
-        selectedGroupId={selectedGroupId}
-        handleSelectGroup={handleSelectGroupId}
-        ingredientGroup={ingredientGroup}
-        selectedUnitId={selectedUnitId}
-        handleSelectUnit={handleSelectUnitId}
-        units={units}
-        inputPrice={inputPrice}
-        handleChangePrice={handleChangePrice}
-      />
-      <ul>
-        {ingredients.map((ingredient) => {
-          const groupName = ingredientGroup.find(
-            (group) => group.id === ingredient.ingredientGroupId
-          )?.name;
-          const unitName = units.find(
-            (unit) => unit.id === ingredient.unitId
-          )?.name;
+    <ul className="pt-5 pb-5">
+      {ingredients.map((ingredient) => {
+        const groupName = ingredientGroups.find(
+          (group) => group.id === ingredient.ingredientGroupId
+        )?.name;
+        const groupColor = ingredientGroupColors.find(
+          (color) => color.ingredientGroupId === ingredient.ingredientGroupId
+        )?.colorCode;
+        const unitName = units.find(
+          (unit) => unit.id === ingredient.unitId
+        )?.name;
+        const isClicked = ingredient.id === clickedListId;
 
-          return (
-            <li key={ingredient.id}>
-              <span>{ingredient.name}</span>
-              <span>{groupName}</span>
-              <span>{unitName}</span>
-              <span>
+        return (
+          <li
+            key={ingredient.id}
+            className={clsx(
+              "flex items-center justify-between relative h-15 mb-3 p-3 shadow-md rounded",
+              {
+                "outline-primary outline-3": isClicked,
+                "outline-border outline-1": !isClicked,
+              }
+            )}
+          >
+            <button
+              className={`absolute top-0 left-0 cursor-pointer w-full h-full rounded ${
+                isClicked ? "pointer-events-none" : "pointer-events-auto"
+              }`}
+              onClick={() => handleClickedListId(ingredient.id)}
+            ></button>
+            <div className="flex items-center">
+              {/* 食材名 */}
+              <div className="text-xl font-bold mr-4">{ingredient.name}</div>
+              {/* 分類 */}
+              <div
+                style={{
+                  backgroundColor: `${groupColor ? groupColor : "inherit"}`,
+                }}
+                className="px-3 py-1 rounded mr-4"
+              >
+                {groupName}
+              </div>
+              {/* 相場 */}
+              <div>
                 {ingredient.pricePerUnit &&
                   `1${unitName}あたり${ingredient.pricePerUnit}円`}
-              </span>
-              <button
-                onClick={() => handleEditStart(ingredient.id)}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer font-bold"
-              >
-                編集
-              </button>
-              <button
-                onClick={() => handleDelete(ingredient.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:cursor-pointer font-bold"
-              >
-                削除
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </>
+              </div>
+            </div>
+            {/* ボタン */}
+            <div
+              className={clsx("flex items-center", {
+                visible: isClicked,
+                hidden: !isClicked,
+              })}
+            >
+              <IconButton
+                icon={Pencil}
+                className="mr-3"
+                variant="filled"
+                size="sm"
+                radius="circle"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showModal(
+                    <IngredientsForm
+                      targetId={ingredient.id}
+                    />
+                  );
+                }}
+              />
+              <IconButton
+                icon={X}
+                variant="filled"
+                size="sm"
+                radius="circle"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteConfirm({
+                    id: ingredient.id,
+                    name: ingredient.name,
+                  });
+                }}
+              />
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 };
 

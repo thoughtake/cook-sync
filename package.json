@@ -6,22 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.3.5"
+    "clsx": "2.1.1",
+    "dotenv": "17.2.0",
+    "drizzle-orm": "0.44.3",
+    "lucide-react": "0.525.0",
+    "mysql2": "3.14.2",
+    "next": "15.3.5",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "swr": "2.3.4",
+    "zod": "4.0.5"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
+    "@eslint/eslintrc": "3",
+    "@tailwindcss/postcss": "4",
+    "@types/node": "20",
+    "@types/react": "19",
+    "@types/react-dom": "19",
+    "drizzle-kit": "0.31.4",
+    "eslint": "9",
     "eslint-config-next": "15.3.5",
-    "@eslint/eslintrc": "^3"
+    "tailwindcss": "4",
+    "tsx": "4.20.3",
+    "typescript": "5"
   }
 }
