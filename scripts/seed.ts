@@ -14,6 +14,40 @@ async function seed() {
 
   console.log("Seeding started...");
 
+  // 単位
+  const existingUnits = await db.select().from(units);
+  if (existingUnits.length === 0) {
+    await db.insert(units).values([
+      { name: "個", amountPerUnit: 1 },
+      { name: "g", amountPerUnit: 100 },
+      { name: "ml", amountPerUnit: 100 },
+    ]);
+    console.log("Units seeded");
+  }
+
+  //分類
+  const existingGroups = await db.select().from(ingredientGroups);
+  if (existingGroups.length === 0) {
+    await db
+      .insert(ingredientGroups)
+      .values([
+        { name: "野菜" },
+        { name: "肉" },
+        { name: "魚介類" },
+        { name: "卵・乳製品" },
+        { name: "大豆製品・豆類" },
+        { name: "穀類・パン・麺類" },
+        { name: "調味料・香辛料・だし" },
+        { name: "油・脂類" },
+        { name: "果物" },
+        { name: "きのこ・海藻" },
+        { name: "飲料・酒類" },
+        { name: "お菓子" },
+        { name: "その他" },
+      ]);
+    console.log("Ingredient groups seeded");
+  }
+
   //材料
   const existingIngredients = await db.select().from(ingredients);
   if (existingIngredients.length === 0) {
@@ -183,40 +217,6 @@ async function seed() {
       { name: "三温糖", ingredientGroupId: 7, unitId: 2, pricePerUnit: 30 },
     ]);
     console.log("Ingredients seeded");
-  }
-
-  // 単位
-  const existingUnits = await db.select().from(units);
-  if (existingUnits.length === 0) {
-    await db.insert(units).values([
-      { name: "個", amountPerUnit: 1 },
-      { name: "g", amountPerUnit: 100 },
-      { name: "ml", amountPerUnit: 100 },
-    ]);
-    console.log("Units seeded");
-  }
-
-  //分類
-  const existingGroups = await db.select().from(ingredientGroups);
-  if (existingGroups.length === 0) {
-    await db
-      .insert(ingredientGroups)
-      .values([
-        { name: "野菜" },
-        { name: "肉" },
-        { name: "魚介類" },
-        { name: "卵・乳製品" },
-        { name: "大豆製品・豆類" },
-        { name: "穀類・パン・麺類" },
-        { name: "調味料・香辛料・だし" },
-        { name: "油・脂類" },
-        { name: "果物" },
-        { name: "きのこ・海藻" },
-        { name: "飲料・酒類" },
-        { name: "お菓子" },
-        { name: "その他" },
-      ]);
-    console.log("Ingredient groups seeded");
   }
 
   const existingColors = await db.select().from(ingredientGroupColors);

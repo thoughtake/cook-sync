@@ -4,6 +4,7 @@ import {
   varchar,
   boolean,
   decimal,
+  foreignKey,
 } from "drizzle-orm/mysql-core";
 
 //食材
@@ -30,13 +31,21 @@ export const ingredientGroups = mysqlTable("ingredient_groups", {
   name: varchar("name", { length: 255 }).notNull(),
 });
 
-export const ingredientGroupColors = mysqlTable("ingredient_group_colors", {
-  id: int("id").autoincrement().primaryKey(),
-  ingredientGroupId: int("ingredient_group_id")
-    .notNull()
-    .references(() => ingredients.id),
-  colorCode: varchar("color_code", { length: 7 }).notNull(),
-});
+export const ingredientGroupColors = mysqlTable(
+  "ingredient_group_colors",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    ingredientGroupId: int("ingredient_group_id").notNull(),
+    colorCode: varchar("color_code", { length: 7 }).notNull(),
+  },
+  (table) => ({
+    fkGroupColorToGroup: foreignKey({
+      columns: [table.ingredientGroupId],
+      foreignColumns: [ingredientGroups.id],
+      name: "fk_group_color_to_group",
+    }),
+  })
+);
 
 //料理
 export const dishes = mysqlTable("dishes", {
