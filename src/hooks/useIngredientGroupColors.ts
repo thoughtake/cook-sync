@@ -1,9 +1,9 @@
 import { fetcher } from "@/libs/fetcher";
-import { ingredientGroupColor } from "@/types";
+import { IngredientGroupColor } from "@/types";
 import useSWR, { mutate } from "swr";
 
 const useIngredientGroupColors = () => {
-  const { data } = useSWR<ingredientGroupColor[]>(
+  const { data } = useSWR<IngredientGroupColor[]>(
     "api/ingredient-group-colors",
     fetcher,
     {

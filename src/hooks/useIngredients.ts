@@ -1,14 +1,14 @@
 import { fetcher } from "@/libs/fetcher"
 import { Ingredient } from "@/types"
-import useSWR, { mutate } from "swr"
+import useSWR from "swr"
 
 const useIngredients = () => {
-  const { data } = useSWR<Ingredient[]>("api/ingredients", fetcher, {
+  const { data, mutate } = useSWR<Ingredient[]>("api/ingredients", fetcher, {
     suspense: true,
   });
   return {
     ingredients: data ?? [],
-    mutateIngredients: () => mutate("api/ingredients"),
+    mutateIngredients: mutate,
   };
 }
 

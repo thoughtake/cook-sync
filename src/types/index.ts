@@ -1,9 +1,3 @@
-export type User = {
-  id: number;
-  name: string;
-  pantry: UserPantry[];
-};
-
 export type Unit = {
   id: number;
   name: string;
@@ -23,49 +17,17 @@ export type IngredientGroup = {
   name: string;
 };
 
-export type ingredientGroupColor = {
+export type IngredientGroupColor = {
   id: number;
   ingredientGroupId: number;
   colorCode: string;
 };
 
-export type DishIngredient = {
-  ingredientId: number;
-  amount: string;
-  unitId: number;
-  ingredient?: Ingredient;
-};
-
-export type Recipe = {
-  id: number;
-  order: number;
-  description: string;
-};
-
-export type Dish = {
-  id: number;
-  name: string;
-  ingredients: Ingredient[];
-  recipe: Recipe[];
-  favorite: boolean;
-  dishGroupId: number;
-  servings: number;
-};
-
-export type DishGroup = {
-  id: number;
-  name: string;
-};
-
-export type UserPantry = {
-  ingredientId: number;
-  amount: number;
-  unitId: number;
-};
-
-export type MissingIngredient = {
-  ingredientId: number;
-  requiredAmount: number;
-  userAmount: number;
-  shortageAmount: number;
-};
+export type Dishes = {
+    id: number;
+    name: string;
+    timeMinutes: number;
+    servings: number;
+    isFavorite: boolean;
+    imageUrl: string;
+}

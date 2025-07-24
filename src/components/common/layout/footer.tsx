@@ -13,7 +13,10 @@ const Footer = () => {
               <Link href="/">ホーム</Link>
             </li>
             <li>
-              <Link href="/ingredients">材料</Link>
+              <Link href="/dishes">料理</Link>
+            </li>
+            <li>
+              <Link href="/ingredients">食材</Link>
             </li>
           </ul>
         </nav>
