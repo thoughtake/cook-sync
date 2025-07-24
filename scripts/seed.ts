@@ -298,12 +298,12 @@ async function seed() {
       },
       {
         dishId: 1,
-        ingredientId: 102, // 類粒和風だし（顆粒和風だし）
+        ingredientId: 91, // 類粒和風だし（顆粒和風だし）
         quantity: "7.5",
       },
       {
         dishId: 1,
-        ingredientId: 103, // 三温糖
+        ingredientId: 92, // 三温糖
         quantity: "30",
       },
       {
