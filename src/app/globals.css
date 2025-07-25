@@ -41,6 +41,7 @@ body {
   /* color: var(--foreground); */
   font-family: var(--font-stack);
   color: var(--color-text);
+  background-color: #FFF9EB;
   box-sizing: content-box;
 }
 

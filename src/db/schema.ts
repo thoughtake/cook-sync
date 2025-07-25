@@ -36,15 +36,16 @@ export const ingredientGroupColors = mysqlTable(
   {
     id: int("id").autoincrement().primaryKey(),
     ingredientGroupId: int("ingredient_group_id").notNull(),
-    colorCode: varchar("color_code", { length: 7 }).notNull(),
+    bgColorCode: varchar("bg_color_code", { length: 7 }).notNull(),
+    textColorCode: varchar("text_color_code", { length: 7 }).notNull(),
   },
-  (table) => ({
-    fkGroupColorToGroup: foreignKey({
+  (table) => [
+    foreignKey({
       columns: [table.ingredientGroupId],
       foreignColumns: [ingredientGroups.id],
       name: "fk_group_color_to_group",
     }),
-  })
+  ]
 );
 
 //料理

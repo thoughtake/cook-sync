@@ -32,7 +32,7 @@ async function seed() {
       .insert(ingredientGroups)
       .values([
         { name: "野菜" },
-        { name: "肉" },
+        { name: "肉類" },
         { name: "魚介類" },
         { name: "卵・乳製品" },
         { name: "大豆製品・豆類" },
@@ -222,19 +222,71 @@ async function seed() {
   const existingColors = await db.select().from(ingredientGroupColors);
   if (existingColors.length === 0) {
     await db.insert(ingredientGroupColors).values([
-      { ingredientGroupId: 1, colorCode: "#4CAF50" },
-      { ingredientGroupId: 2, colorCode: "#E57373" },
-      { ingredientGroupId: 3, colorCode: "#4FC3F7" },
-      { ingredientGroupId: 4, colorCode: "#FFF176" },
-      { ingredientGroupId: 5, colorCode: "#A1887F" },
-      { ingredientGroupId: 6, colorCode: "#FBC02D" },
-      { ingredientGroupId: 7, colorCode: "#FF8A65" },
-      { ingredientGroupId: 8, colorCode: "#FFD54F" },
-      { ingredientGroupId: 9, colorCode: "#FF7043" },
-      { ingredientGroupId: 10, colorCode: "#8D6E63" },
-      { ingredientGroupId: 11, colorCode: "#64B5F6" },
-      { ingredientGroupId: 12, colorCode: "#BA68C8" },
-      { ingredientGroupId: 13, colorCode: "#BDBDBD" },
+      {
+        ingredientGroupId: 1,
+        bgColorCode: "#E8F5E9",
+        textColorCode: "#388E3C",
+      },
+      {
+        ingredientGroupId: 2,
+        bgColorCode: "#FFEBEE",
+        textColorCode: "#C62828",
+      },
+      {
+        ingredientGroupId: 3,
+        bgColorCode: "#E1F5FE",
+        textColorCode: "#0288D1",
+      },
+      {
+        ingredientGroupId: 4,
+        bgColorCode: "#FFFDE7",
+        textColorCode: "#FBC02D",
+      },
+      {
+        ingredientGroupId: 5,
+        bgColorCode: "#EFEBE9",
+        textColorCode: "#6D4C41",
+      },
+      {
+        ingredientGroupId: 6,
+        bgColorCode: "#FFF8E1",
+        textColorCode: "#FFA000",
+      },
+      {
+        ingredientGroupId: 7,
+        bgColorCode: "#FBE9E7",
+        textColorCode: "#D84315",
+      },
+      {
+        ingredientGroupId: 8,
+        bgColorCode: "#FFFDE7",
+        textColorCode: "#F9A825",
+      },
+      {
+        ingredientGroupId: 9,
+        bgColorCode: "#FBE9E7",
+        textColorCode: "#EF6C00",
+      },
+      {
+        ingredientGroupId: 10,
+        bgColorCode: "#EFEBE9",
+        textColorCode: "#5D4037",
+      },
+      {
+        ingredientGroupId: 11,
+        bgColorCode: "#E3F2FD",
+        textColorCode: "#1976D2",
+      },
+      {
+        ingredientGroupId: 12,
+        bgColorCode: "#F3E5F5",
+        textColorCode: "#8E24AA",
+      },
+      {
+        ingredientGroupId: 13,
+        bgColorCode: "#FAFAFA",
+        textColorCode: "#757575",
+      },
     ]);
     console.log("Ingredient group colors seeded");
   }
