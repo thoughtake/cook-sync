@@ -72,9 +72,9 @@ const IngredientsPage = () => {
         const groupColor = ingredientGroupColors.find(
           (color) => color.ingredientGroupId === ingredient.ingredientGroupId
         )?.colorCode;
-        const unitName = units.find(
+        const unit = units.find(
           (unit) => unit.id === ingredient.unitId
-        )?.name;
+        );
         const isClicked = ingredient.id === clickedListId;
 
         return (
@@ -109,7 +109,7 @@ const IngredientsPage = () => {
               {/* 相場 */}
               <div>
                 {ingredient.pricePerUnit &&
-                  `1${unitName}あたり${ingredient.pricePerUnit}円`}
+                  `${unit?.amountPerUnit}${unit?.name}あたり${ingredient.pricePerUnit}円`}
               </div>
             </div>
             {/* ボタン */}

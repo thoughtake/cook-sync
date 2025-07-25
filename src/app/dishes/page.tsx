@@ -16,12 +16,12 @@ const DishesPage = () => {
         {dishes.map((dish) => (
           <li
             key={dish.id}
-            className="relative basis-[calc(33.333%-1rem)] max-w-[calc(33.333%-1rem)] h-70 rounded shadow-md overflow-hidden hover:outline-primary hover:outline-2"
+            className="relative basis-[calc(33.333%-1rem)] max-w-[calc(33.333%-1rem)] h-70 rounded shadow-md overflow-hidden hover:outline-primary hover:outline-3"
           >
             <button
               className="absolute top-0 left-0 w-full h-full cursor-pointer rounded z-2"
               onClick={() => {
-                showModal(<DishInfo dish={dish} />);
+                showModal(<DishInfo dishId={dish.id} />);
               }}
             ></button>
             <div className="relative w-full h-48">

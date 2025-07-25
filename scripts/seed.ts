@@ -52,18 +52,18 @@ async function seed() {
   const existingIngredients = await db.select().from(ingredients);
   if (existingIngredients.length === 0) {
     await db.insert(ingredients).values([
-      { name: "にんじん", ingredientGroupId: 1, unitId: 2, pricePerUnit: 35 },
-      { name: "玉ねぎ", ingredientGroupId: 1, unitId: 2, pricePerUnit: 28 },
-      { name: "じゃがいも", ingredientGroupId: 1, unitId: 2, pricePerUnit: 40 },
-      { name: "キャベツ", ingredientGroupId: 1, unitId: 2, pricePerUnit: 25 },
+      { name: "にんじん", ingredientGroupId: 1, unitId: 1, pricePerUnit: 60 },
+      { name: "玉ねぎ", ingredientGroupId: 1, unitId: 1, pricePerUnit: 40 },
+      { name: "じゃがいも", ingredientGroupId: 1, unitId: 1, pricePerUnit: 50 },
+      { name: "キャベツ", ingredientGroupId: 1, unitId: 1, pricePerUnit: 200 },
       { name: "きゅうり", ingredientGroupId: 1, unitId: 1, pricePerUnit: 45 },
-      { name: "トマト", ingredientGroupId: 1, unitId: 1, pricePerUnit: 60 },
-      { name: "レタス", ingredientGroupId: 1, unitId: 2, pricePerUnit: 30 },
+      { name: "トマト", ingredientGroupId: 1, unitId: 1, pricePerUnit: 100 },
+      { name: "レタス", ingredientGroupId: 1, unitId: 1, pricePerUnit: 150 },
       {
         name: "ブロッコリー",
         ingredientGroupId: 1,
         unitId: 1,
-        pricePerUnit: 120,
+        pricePerUnit: 180,
       },
       { name: "鶏むね肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 78 },
       { name: "鶏もも肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 98 },
@@ -135,20 +135,20 @@ async function seed() {
       { name: "小松菜", ingredientGroupId: 1, unitId: 2, pricePerUnit: 25 },
       { name: "ほうれん草", ingredientGroupId: 1, unitId: 2, pricePerUnit: 30 },
       { name: "大根", ingredientGroupId: 1, unitId: 2, pricePerUnit: 20 },
-      { name: "なす", ingredientGroupId: 1, unitId: 1, pricePerUnit: 40 },
-      { name: "ピーマン", ingredientGroupId: 1, unitId: 1, pricePerUnit: 35 },
+      { name: "なす", ingredientGroupId: 1, unitId: 1, pricePerUnit: 70 },
+      { name: "ピーマン", ingredientGroupId: 1, unitId: 1, pricePerUnit: 40 },
       { name: "ごぼう", ingredientGroupId: 1, unitId: 2, pricePerUnit: 25 },
       { name: "さつまいも", ingredientGroupId: 1, unitId: 2, pricePerUnit: 50 },
       { name: "れんこん", ingredientGroupId: 1, unitId: 2, pricePerUnit: 60 },
-      { name: "ズッキーニ", ingredientGroupId: 1, unitId: 1, pricePerUnit: 50 },
+      { name: "ズッキーニ", ingredientGroupId: 1, unitId: 1, pricePerUnit: 90 },
       { name: "オクラ", ingredientGroupId: 1, unitId: 1, pricePerUnit: 45 },
       {
         name: "カリフラワー",
         ingredientGroupId: 1,
         unitId: 1,
-        pricePerUnit: 80,
+        pricePerUnit: 220,
       },
-      { name: "ミニトマト", ingredientGroupId: 1, unitId: 1, pricePerUnit: 60 },
+      { name: "ミニトマト", ingredientGroupId: 1, unitId: 2, pricePerUnit: 78 },
       { name: "鶏ひき肉", ingredientGroupId: 2, unitId: 2, pricePerUnit: 95 },
       { name: "鶏手羽先", ingredientGroupId: 2, unitId: 2, pricePerUnit: 110 },
       {
@@ -278,7 +278,7 @@ async function seed() {
       },
       {
         dishId: 1,
-        ingredientId: 76, // 水
+        ingredientId: 40, // 水
         quantity: "200",
       },
       {
@@ -298,18 +298,18 @@ async function seed() {
       },
       {
         dishId: 1,
-        ingredientId: 91, // 類粒和風だし（顆粒和風だし）
-        quantity: "7.5",
+        ingredientId: 92, // 類粒和風だし
+        quantity: "4.5",
       },
       {
         dishId: 1,
-        ingredientId: 92, // 三温糖
-        quantity: "30",
+        ingredientId: 93, // 三温糖
+        quantity: "18",
       },
       {
         dishId: 1,
         ingredientId: 31, // サラダ油
-        quantity: "0",
+        quantity: "15",
       },
     ]);
   }

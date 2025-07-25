@@ -41,7 +41,7 @@ const Modal = () => {
       onClick={handleClose}
     >
       <div
-        className="bg-white p-6 rounded w-940 max-w-[940px] mx-auto outline-primary outline-3"
+        className="bg-white p-8 rounded w-940 max-w-[940px] mx-auto outline-primary outline-3"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-right">
