@@ -1,6 +1,8 @@
 import { ingredients } from "@/db/schema";
 import useDishIngredients from "@/hooks/useDishIngredients";
 import useDishRecipes from "@/hooks/useDishRecipes";
+import useIngredients from "@/hooks/useIngredients";
+import useUnits from "@/hooks/useUnits";
 import { Dish, DishIngredient } from "@/types";
 import { Timer } from "lucide-react";
 import Image from "next/image";
@@ -11,12 +13,15 @@ const DishInfo = ({ dish }: { dish: Dish }) => {
   const { dishRecipes } = useDishRecipes();
 
   const ingredientsForDish = useMemo<DishIngredient[]>(() => {
-    dishIngredients.filter((d) => d.dishId === dish.id);
+    return dishIngredients.filter((d) => d.dishId === dish.id);
   }, [dishIngredients, dish]);
 
   const recipesForDish = useMemo(() => {
-    dishRecipes.filter((r)=>r.dishId === dish.id);
-  }, [dishRecipes, dish])
+    dishRecipes.filter((r) => r.dishId === dish.id);
+  }, [dishRecipes, dish]);
+
+  const { ingredients } = useIngredients();
+  const { units } = useUnits();
 
   return (
     <>
@@ -44,16 +49,29 @@ const DishInfo = ({ dish }: { dish: Dish }) => {
           <span className="text-sm">分</span>
         </div>
       </div>
-      <h3 className="text-xl font-bold text-center bg-primary py-1">
-        材料
-        </h3>
+      <h3 className="text-xl font-bold text-center bg-primary py-1">材料</h3>
       <ul>
-        {ingredientsForDish.map((i)=> (
-          <li key={i.id}>{i.name}</li>
-        )
-        )}
-      </ul>
+        {ingredientsForDish.map((ifd) => {
+          const targetIngredient = ingredients.find(
+            (ingredient) => ifd.ingredientId === ingredient.id
+          );
+          const targetUnit = units.find(
+            (unit) => targetIngredient?.unitId === unit.id
+          );
 
+          return (
+            targetUnit && (
+              <li key={ifd.id} className="flex">
+                <div>{targetIngredient?.name}</div>
+                <div>
+                  <span>{parseFloat(ifd.quantity)}</span>
+                  <span>{targetUnit?.name}</span>
+                </div>
+              </li>
+            )
+          );
+        })}
+      </ul>
     </>
   );
 };

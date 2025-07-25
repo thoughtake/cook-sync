@@ -37,11 +37,11 @@ const Modal = () => {
   return (
     <dialog
       ref={modalRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 w-full h-full"
+      className="w-fit m-auto"
       onClick={handleClose}
     >
       <div
-        className="bg-white p-6 rounded w-full max-w-[940px] mx-auto outline-primary outline-3"
+        className="bg-white p-6 rounded w-940 max-w-[940px] mx-auto outline-primary outline-3"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-right">
