@@ -1,9 +1,9 @@
-import useDishes from "@/hooks/useDishes";
-import useDishIngredients from "@/hooks/useDishIngredients";
-import useDishRecipes from "@/hooks/useDishRecipes";
-import useIngredients from "@/hooks/useIngredients";
-import useUnits from "@/hooks/useUnits";
-import { Dish, DishIngredient, DishRecipe } from "@/types";
+import useDishes from "@/hooks/use-dishes";
+import useDishIngredients from "@/hooks/use-dish-Ingredients";
+import useDishRecipes from "@/hooks/use-dish-recipes";
+import useIngredients from "@/hooks/use-ingredients";
+import useUnits from "@/hooks/use-units";
+import { DishIngredient, DishRecipe } from "@/types";
 import { BadgeJapaneseYen, Heart, Timer, Users } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";

@@ -4,9 +4,9 @@ import InputText from "../common/ui/form/input-text";
 import SelectBox from "../common/ui/form/select-box";
 import StandardButton from "../common/ui/button/standard-button";
 import { useModal } from "../../context/modal-context";
-import useIngredients from "@/hooks/useIngredients";
-import useIngredientGroups from "@/hooks/useIngredientGroups";
-import useUnits from "@/hooks/useUnits";
+import useIngredients from "@/hooks/use-ingredients";
+import useIngredientGroups from "@/hooks/use-ingredient-groups";
+import useUnits from "@/hooks/use-units";
 
 type Props = {
   targetId: number | null;

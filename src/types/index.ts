@@ -20,8 +20,8 @@ export type IngredientGroup = {
 export type IngredientGroupColor = {
   id: number;
   ingredientGroupId: number;
-  bg_color_code: string;
-  text_color_code: string;
+  bgColorCode: string;
+  textColorCode: string;
 };
 
 export type Dish = {

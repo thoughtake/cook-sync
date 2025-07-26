@@ -7,10 +7,10 @@ import IconButton from "@/components/common/ui/button/icon-button";
 import IngredientsForm from "@/components/ingredients/ingredients-form";
 import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
 import clsx from "clsx";
-import useIngredients from "@/hooks/useIngredients";
-import useIngredientGroups from "@/hooks/useIngredientGroups";
-import useUnits from "@/hooks/useUnits";
-import useIngredientGroupColors from "@/hooks/useIngredientGroupColors";
+import useIngredients from "@/hooks/use-ingredients";
+import useIngredientGroups from "@/hooks/use-ingredient-groups";
+import useUnits from "@/hooks/use-units";
+import useIngredientGroupColors from "@/hooks/use-ingredient-group-colors";
 
 const IngredientsPage = () => {
   const { ingredients, mutateIngredients } = useIngredients();
@@ -71,10 +71,8 @@ const IngredientsPage = () => {
         )?.name;
         const groupColor = ingredientGroupColors.find(
           (color) => color.ingredientGroupId === ingredient.ingredientGroupId
-        )?.colorCode;
-        const unit = units.find(
-          (unit) => unit.id === ingredient.unitId
         );
+        const unit = units.find((unit) => unit.id === ingredient.unitId);
         const isClicked = ingredient.id === clickedListId;
 
         return (
@@ -100,9 +98,16 @@ const IngredientsPage = () => {
               {/* 分類 */}
               <div
                 style={{
-                  backgroundColor: `${groupColor ? groupColor : "inherit"}`,
+                  backgroundColor: `${
+                    groupColor?.bgColorCode ? groupColor.bgColorCode : "inherit"
+                  }`,
+                  color: `${
+                    groupColor?.textColorCode
+                      ? groupColor.textColorCode
+                      : "inherit"
+                  }`,
                 }}
-                className="px-3 py-1 rounded mr-4"
+                className="px-3 py-1 rounded mr-4 font-bold"
               >
                 {groupName}
               </div>

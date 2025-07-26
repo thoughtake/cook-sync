@@ -2,7 +2,7 @@
 
 import DishInfo from "@/components/dishes/dishes-info";
 import { useModal } from "@/context/modal-context";
-import useDishes from "@/hooks/useDishes";
+import useDishes from "@/hooks/use-dishes";
 import { Timer } from "lucide-react";
 import Image from "next/image";
 
