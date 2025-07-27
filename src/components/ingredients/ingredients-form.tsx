@@ -7,6 +7,7 @@ import { useModal } from "../../context/modal-context";
 import useIngredients from "@/hooks/use-ingredients";
 import useIngredientGroups from "@/hooks/use-ingredient-groups";
 import useUnits from "@/hooks/use-units";
+import SelectBoxNew from "../common/ui/form/selext-box-new";
 
 type Props = {
   targetId: number | null;
@@ -228,6 +229,18 @@ const IngredientsForm = (props: Props) => {
           }
           options={ingredientGroups}
         />
+
+        <SelectBoxNew
+          name="unit"
+          label="単位"
+          value={selectedUnitId ?? ""}
+          isRequired={true}
+          onChange={(value) =>
+            handleSelectUnitId(value ? Number(value) : null)
+          }
+          options={units}
+        />
+
         <SelectBox
           name="unit"
           label="単位"
