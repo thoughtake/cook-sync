@@ -5,6 +5,7 @@ import { createContext, ReactNode, useContext, useState } from "react";
 type ContextType = {
   showModal: (content: ReactNode) => void;
   closeModal: () => void;
+  closeModalAll: () => void;
   contents: ReactNode[];
 };
 
@@ -21,9 +22,13 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     setContents((prev) => prev.slice(0, -1));
   };
 
+  const closeModalAll = () => {
+    setContents([]);
+  }
+
   return (
     <ModalContext.Provider
-      value={{ showModal, closeModal, contents: contents }}
+      value={{ showModal, closeModal, closeModalAll, contents }}
     >
       {children}
     </ModalContext.Provider>
