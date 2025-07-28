@@ -4,9 +4,18 @@ import useDishRecipes from "@/hooks/use-dish-recipes";
 import useIngredients from "@/hooks/use-ingredients";
 import useUnits from "@/hooks/use-units";
 import { DishIngredient, DishRecipe } from "@/types";
-import { BadgeJapaneseYen, Heart, Timer, Users } from "lucide-react";
+import {
+  BadgeJapaneseYen,
+  Heart,
+  Pencil,
+  Timer,
+  Trash2,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";
+import IconButton from "../common/ui/button/icon-button";
+import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
 
 const DishInfo = ({ dishId }: { dishId: number }) => {
   const { dishes, mutateDishes } = useDishes();
@@ -16,6 +25,8 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
 
   const { ingredients } = useIngredients();
   const { units } = useUnits();
+
+  const deleteConfirm = useDeleteItemWithConfirm({endpoint: 'api/dishes', mutate: mutateDishes})
 
   const ingredientsForDish = useMemo<DishIngredient[]>(() => {
     return dishIngredients.filter((d) => d.dishId === dish?.id);
@@ -56,6 +67,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
 
   if (!dish) return;
 
+  //お気に入り登録
   const handleClickFavorite = async () => {
     const newFavorite = { ...dish, isFavorite: !dish.isFavorite };
 
@@ -197,6 +209,26 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
           </li>
         ))}
       </ul>
+      <div className="text-right mt-10">
+        <IconButton
+          icon={Pencil}
+          className="mr-3"
+          variant="filled"
+          size="md"
+          radius="circle"
+          onClick={() => {}}
+        />
+        <IconButton
+          icon={Trash2}
+          variant="filled"
+          size="md"
+          radius="circle"
+          color="red"
+          onClick={() => {
+            deleteConfirm({id: dishId, name: dish.name})
+          }}
+        />
+      </div>
     </>
   );
 };

@@ -2,11 +2,26 @@ import { db } from "@/db";
 import { dishes } from "@/db/schema";
 import { DishSchema } from "@/schemas/dish-schema";
 import { eq } from "drizzle-orm";
+import { deleteHandler } from "../../delete-handler";
 
-export async function PUT(
+export const DELETE = async (
+  req: Request,
+  {params}: {params: Promise<{id: string}>}
+) => {
+  const id = (await params).id;
+
+  return await deleteHandler({
+    table: dishes,
+    column: dishes.id,
+    id: id
+  })
+}
+
+
+export const PUT = async (
   req: Request,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
     const id = Number(params.id);
 

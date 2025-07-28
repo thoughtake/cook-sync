@@ -2,31 +2,27 @@ import { db } from "@/db";
 import { ingredients } from "@/db/schema";
 import { IngredientSchema } from "@/schemas/ingredient-schema";
 import { eq } from "drizzle-orm";
+import { deleteHandler } from "../../delete-handler";
 
-export async function DELETE(
+export const DELETE = async (
   req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = Number(params.id);
+  {params}: { params: Promise<{id: string}> }
+) => {
 
-    if (isNaN(id)) {
-      return Response.json({ error: "idが数値ではありません", id }, { status: 400 });
-    }
+  const id = (await params).id;
+  
+  return await deleteHandler({
+    table: ingredients,
+    column: ingredients.id,
+    id: id
+  })
 
-    await db.delete(ingredients).where(eq(ingredients.id, id));
-
-    return Response.json({ success: true, deletedId: id });
-  } catch (error) {
-    console.error("DELETE /api/ingredients/[id] error:", error);
-    return Response.json({ error: "削除に失敗しました" }, { status: 500 });
-  }
 }
 
-export async function PUT(
+export const PUT = async (
   req: Request,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
     const id = Number(params.id);
 

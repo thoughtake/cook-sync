@@ -1,22 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2} from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useModal } from "@/context/modal-context";
 import IconButton from "@/components/common/ui/button/icon-button";
 import IngredientsForm from "@/components/ingredients/ingredients-form";
-import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
 import clsx from "clsx";
 import useIngredients from "@/hooks/use-ingredients";
 import useIngredientGroups from "@/hooks/use-ingredient-groups";
 import useUnits from "@/hooks/use-units";
 import useIngredientGroupColors from "@/hooks/use-ingredient-group-colors";
+import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
 
 const IngredientsPage = () => {
   const { ingredients, mutateIngredients } = useIngredients();
   const { ingredientGroups } = useIngredientGroups();
   const { ingredientGroupColors } = useIngredientGroupColors();
   const { units } = useUnits();
+
+  const deleteConfirm = useDeleteItemWithConfirm({
+    endpoint: "api/ingredients",
+    mutate: mutateIngredients,
+  });
 
   //クリックされたリストのID
   const [clickedListId, setClickedListId] = useState<number | null>(null);
@@ -30,37 +35,9 @@ const IngredientsPage = () => {
     setClickedListId(id);
   };
 
-  //削除
-  const handleDelete = async (id: number) => {
-    if (id) {
-      try {
-        const res = await fetch(`/api/ingredients/${id}`, {
-          method: "DELETE",
-        });
-        // const result = await res.json();
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || "削除に失敗しました");
-        }
-
-        //GET
-        await mutateIngredients();
-      } catch (err) {
-        alert("削除に失敗しました");
-        console.error("削除エラー：", err, "ID：", id);
-      }
-    }
-  };
-
   //削除確認
   const handleDeleteConfirm = ({ id, name }: { id: number; name: string }) => {
-    showModal(
-      <ModalConfirm
-        message={`${name} を削除してよろしいですか？`}
-        onConfirm={() => handleDelete(id)}
-      />
-    );
+    deleteConfirm({id, name});
   };
 
   return (

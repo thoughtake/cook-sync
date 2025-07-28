@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { dishRecipes } from "@/db/schema";
 
-export async function GET() {
+export const GET = async () => {
   try {
     const result = await db.select().from(dishRecipes);
 
