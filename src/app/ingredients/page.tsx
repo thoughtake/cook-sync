@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, X } from "lucide-react";
+import { Pencil, Trash2} from "lucide-react";
 import { useModal } from "@/context/modal-context";
 import IconButton from "@/components/common/ui/button/icon-button";
 import IngredientsForm from "@/components/ingredients/ingredients-form";
@@ -136,10 +136,11 @@ const IngredientsPage = () => {
                 }}
               />
               <IconButton
-                icon={X}
+                icon={Trash2}
                 variant="filled"
                 size="sm"
                 radius="circle"
+                color="red"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDeleteConfirm({

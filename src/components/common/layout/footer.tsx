@@ -13,6 +13,7 @@ const NavLink = ({ href, label }: { href: string; label: string }) => {
       href={href}
       className={clsx(
         "flex items-center justify-center h-full text-lg  font-bold cursor-pointer rounded",
+        "hover: bg-[#FF8C00]",
         pathname === href
         ? "bg-[#FF8C00] text-white"
         : "bg-inherit text-text"

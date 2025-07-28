@@ -24,7 +24,6 @@ const SelectBox = (props: Props) => {
     className = "w-full",
   } = props;
 
-
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const filteredOptions = options.filter((option) => {
@@ -48,6 +47,7 @@ const SelectBox = (props: Props) => {
             value={value}
             onValueChange={(val) => {
               if (val === "") return;
+              console.log('onChangeValue')
               onChange(Number(val));
             }}
             required={isRequired}

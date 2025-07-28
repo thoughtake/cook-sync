@@ -8,7 +8,7 @@ import { useModal } from "../../context/modal-context";
 import useIngredients from "@/hooks/use-ingredients";
 import useIngredientGroups from "@/hooks/use-ingredient-groups";
 import useUnits from "@/hooks/use-units";
-import SelectBox from "../common/ui/form/selext-box";
+import SelectBox from "../common/ui/form/select-box";
 
 type Props = {
   targetId: number | null;
@@ -50,12 +50,15 @@ const IngredientsForm = (props: Props) => {
   //モーダルcontext使用
   const { closeModal } = useModal();
 
+  //targetIdの有無で、編集中かどうかを判断する
+  const isEditMode = targetId !== null;
+
   //対象の食材を取得
   const editTarget = useMemo(() => {
-    if (targetId !== null && ingredients.length > 0) {
+    if (isEditMode && ingredients.length > 0) {
       return ingredients.find((i) => i.id === targetId);
     }
-  }, [targetId, ingredients]);
+  }, [isEditMode, targetId, ingredients]);
 
   // フォームを送れる状態かどうか
   const isDisabled: boolean = useMemo(() => {
@@ -83,13 +86,11 @@ const IngredientsForm = (props: Props) => {
 
   //フォームの内容をリセット
   const resetForm = useCallback(() => {
-    console.log("resetFormした");
     setInputName("");
     setSelectedUnitId(null);
     setSelectedGroupId(null);
     setInputPrice(null);
   }, [setInputName, setSelectedUnitId, setSelectedGroupId, setInputPrice]);
-
 
   // 編集時にフォームに編集対象の情報を初期値としてセット
   useEffect(() => {
@@ -104,16 +105,11 @@ const IngredientsForm = (props: Props) => {
   //フォームの送信（保存）
   const handleSubmitSave = async () => {
     //編集モードでないこと
-    if (
-      selectedUnitId === null ||
-      selectedGroupId === null ||
-      targetId !== null
-    )
+    if (selectedUnitId === null || selectedGroupId === null || isEditMode)
       return;
 
     // 新しい材料を作成
     const newIngredient = {
-      // id: nextId.current,
       name: inputName,
       ingredientGroupId: Number(selectedGroupId),
       unitId: Number(selectedUnitId),
@@ -200,14 +196,14 @@ const IngredientsForm = (props: Props) => {
     // フォーム
     <>
       <h2 className="text-center text-xl font-bold">{`材料を${
-        targetId !== null ? "編集" : "登録"
+        isEditMode ? "編集" : "登録"
       }`}</h2>
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
           //編集IDがあるかどうかで処理をかえる
-          if (targetId !== null) {
+          if (isEditMode) {
             handleSubmitEdit();
           } else {
             handleSubmitSave();
@@ -223,16 +219,8 @@ const IngredientsForm = (props: Props) => {
           isRequired={true}
           onChange={(e) => setInputName(e.target.value)}
         />
-        {/* <SelectBox
-          name="group"
-          label="分類"
-          value={selectedGroupId ?? ""}
-          isRequired={true}
-          onChange={(e) =>
-            handleSelectGroupId(e.target.value ? Number(e.target.value) : null)
-          }
-          options={ingredientGroups}
-        /> */}
+
+        {/* [select]分類 */}
         <SelectBox
           name="group"
           label="分類"
@@ -244,6 +232,7 @@ const IngredientsForm = (props: Props) => {
           options={ingredientGroups}
         />
 
+        {/* [select]単位 */}
         <SelectBox
           name="unit"
           label="単位"
@@ -255,6 +244,8 @@ const IngredientsForm = (props: Props) => {
           options={units}
         />
 
+        {/* [input]相場 */}
+        {/* 単位が選ばれたら表示する */}
         <div className={`${selectedUnitId === null ? "invisible" : "visible"}`}>
           <InputText
             name="相場"
@@ -279,7 +270,7 @@ const IngredientsForm = (props: Props) => {
 
         {/* 送信ボタン */}
         <div>
-          {targetId !== null ? (
+          {isEditMode ? (
             <div className="flex gap-4">
               <StandardButton
                 label="編集"
