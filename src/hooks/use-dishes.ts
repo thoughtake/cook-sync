@@ -5,6 +5,7 @@ import useSWR from "swr";
 const useDishes = () => {
   const { data, mutate } = useSWR<Dish[]>("api/dishes", fetcher, {
     suspense: true,
+    fallbackData: [],
   });
   return {
     dishes: data ?? [],

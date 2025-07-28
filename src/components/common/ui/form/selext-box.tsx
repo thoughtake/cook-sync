@@ -1,19 +1,19 @@
 import * as Select from "@radix-ui/react-select";
 import clsx from "clsx";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
-import { ComponentProps } from "react";
+import { useState } from "react";
 
 type Props = {
   name: string;
   label: string;
-  value: number | string;
+  value: string;
   isRequired: boolean;
-  onChange: (value: string) => void;
+  onChange: (value: number | null) => void;
   options: { id: number; name: string }[];
   className?: string;
 };
 
-const SelectBoxNew = (props: Props) => {
+const SelectBox = (props: Props) => {
   const {
     name,
     label,
@@ -23,6 +23,13 @@ const SelectBoxNew = (props: Props) => {
     options,
     className = "w-full",
   } = props;
+
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const filteredOptions = options.filter((option) => {
+    return option.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   return (
     <div className="mb-7">
@@ -38,25 +45,46 @@ const SelectBoxNew = (props: Props) => {
         <div className="relative">
           <Select.Root
             name={name}
-            value={String(value)}
-            onValueChange={onChange}
+            value={value}
+            onValueChange={(val) => {
+              if (val === "") return;
+              onChange(Number(val));
+            }}
             required={isRequired}
-
           >
-            <Select.Trigger className={clsx(className, " border-border border-3 rounded p-3")} aria-label={label}>
+            <Select.Trigger
+              className={clsx(
+                className,
+                " border-border border-3 rounded p-3 text-left"
+              )}
+              aria-label={label}
+            >
               <Select.Value placeholder="選択してください" />
               <Select.Icon>
-                <ChevronDown className="text-gray-500 w-5 h-5" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               </Select.Icon>
             </Select.Trigger>
 
             <Select.Portal>
-              <Select.Content className="z-100 rounded border border-border bg-white shadow-lg">
+              <Select.Content
+                position="popper"
+                className={clsx(
+                  "z-100 rounded border border-border bg-white shadow-lg p-4",
+                  "w-[var(--radix-select-trigger-width)]",
+                  "overflow-y-auto max-h-100"
+                )}
+              >
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder={`${label}を検索`}
+                  className="mb-2 p-2 border-2 border-border rounded"
+                />
                 <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-white">
                   <ChevronUp />
                 </Select.ScrollUpButton>
-                <Select.Viewport className="p-1">
-                  {options.map((option) => (
+                <Select.Viewport className="">
+                  {filteredOptions.map((option) => (
                     <Select.Item
                       key={option.id}
                       value={String(option.id)}
@@ -64,7 +92,7 @@ const SelectBoxNew = (props: Props) => {
                     >
                       <Select.ItemText>{option.name}</Select.ItemText>
                       <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
-                        <Check className="w-4 h-4 text-primary" />
+                        <Check className="w-4 h-4 text-text" />
                       </Select.ItemIndicator>
                     </Select.Item>
                   ))}
@@ -81,4 +109,4 @@ const SelectBoxNew = (props: Props) => {
   );
 };
 
-export default SelectBoxNew;
+export default SelectBox;

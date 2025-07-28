@@ -8,6 +8,7 @@ const useIngredientGroupColors = () => {
     fetcher,
     {
       suspense: true,
+      fallbackData: [],
     }
   );
   return {

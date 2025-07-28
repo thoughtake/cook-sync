@@ -5,6 +5,7 @@ import useSWR, { mutate } from "swr";
 const useUnits = () => {
   const { data } = useSWR<Unit[]>("api/units", fetcher, {
     suspense: true,
+    fallbackData: [],
   });
   return {
     units: data ?? [],

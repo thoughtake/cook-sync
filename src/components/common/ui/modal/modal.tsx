@@ -16,7 +16,6 @@ import {
 const Modal = () => {
   const { isOpen, closeModal, content } = useModal();
   // const modalRef = useRef<HTMLDialogElement>(null);
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
       <DialogPortal>

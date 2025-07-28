@@ -1,13 +1,14 @@
+"use client";
+
 import { Unit } from "@/types/index";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InputText from "../common/ui/form/input-text";
-import SelectBox from "../common/ui/form/select-box";
 import StandardButton from "../common/ui/button/standard-button";
 import { useModal } from "../../context/modal-context";
 import useIngredients from "@/hooks/use-ingredients";
 import useIngredientGroups from "@/hooks/use-ingredient-groups";
 import useUnits from "@/hooks/use-units";
-import SelectBoxNew from "../common/ui/form/selext-box-new";
+import SelectBox from "../common/ui/form/selext-box";
 
 type Props = {
   targetId: number | null;
@@ -49,6 +50,13 @@ const IngredientsForm = (props: Props) => {
   //モーダルcontext使用
   const { closeModal } = useModal();
 
+  //対象の食材を取得
+  const editTarget = useMemo(() => {
+    if (targetId !== null && ingredients.length > 0) {
+      return ingredients.find((i) => i.id === targetId);
+    }
+  }, [targetId, ingredients]);
+
   // フォームを送れる状態かどうか
   const isDisabled: boolean = useMemo(() => {
     return (
@@ -65,7 +73,7 @@ const IngredientsForm = (props: Props) => {
 
   //セレクトされている単位情報を取得
   const selectedUnit: Unit | undefined = useMemo(() => {
-    return units.find((unit) => unit.id === selectedUnitId);
+    return units.find((unit) => unit.id === Number(selectedUnitId));
   }, [units, selectedUnitId]);
 
   //単位の文言を変更する際に使用
@@ -75,11 +83,23 @@ const IngredientsForm = (props: Props) => {
 
   //フォームの内容をリセット
   const resetForm = useCallback(() => {
+    console.log("resetFormした");
     setInputName("");
     setSelectedUnitId(null);
     setSelectedGroupId(null);
     setInputPrice(null);
   }, [setInputName, setSelectedUnitId, setSelectedGroupId, setInputPrice]);
+
+
+  // 編集時にフォームに編集対象の情報を初期値としてセット
+  useEffect(() => {
+    if (editTarget) {
+      setInputName(editTarget.name);
+      setSelectedGroupId(editTarget.ingredientGroupId);
+      setSelectedUnitId(editTarget.unitId);
+      setInputPrice(editTarget.pricePerUnit ?? null);
+    }
+  }, [editTarget]);
 
   //フォームの送信（保存）
   const handleSubmitSave = async () => {
@@ -95,8 +115,8 @@ const IngredientsForm = (props: Props) => {
     const newIngredient = {
       // id: nextId.current,
       name: inputName,
-      ingredientGroupId: selectedGroupId,
-      unitId: selectedUnitId,
+      ingredientGroupId: Number(selectedGroupId),
+      unitId: Number(selectedUnitId),
       pricePerUnit: inputPrice,
     };
 
@@ -140,8 +160,8 @@ const IngredientsForm = (props: Props) => {
     const newIngredient = {
       // id: targetId,
       name: inputName,
-      ingredientGroupId: selectedGroupId,
-      unitId: selectedUnitId,
+      ingredientGroupId: Number(selectedGroupId),
+      unitId: Number(selectedUnitId),
       pricePerUnit: inputPrice,
     };
 
@@ -176,22 +196,6 @@ const IngredientsForm = (props: Props) => {
     resetForm();
   };
 
-  //編集時にフォームに編集対象の情報を初期値としてセット
-  useEffect(() => {
-    if (targetId !== null) {
-      const editTarget = ingredients.find((i) => i.id === targetId);
-      if (editTarget) {
-        setInputName(editTarget.name);
-        setSelectedGroupId(editTarget.ingredientGroupId);
-        setSelectedUnitId(editTarget.unitId);
-        setInputPrice(editTarget.pricePerUnit ?? null);
-      }
-    } else {
-      //フォームの内容をリセット
-      resetForm();
-    }
-  }, [targetId, ingredients, resetForm]);
-
   return (
     // フォーム
     <>
@@ -219,7 +223,7 @@ const IngredientsForm = (props: Props) => {
           isRequired={true}
           onChange={(e) => setInputName(e.target.value)}
         />
-        <SelectBox
+        {/* <SelectBox
           name="group"
           label="分類"
           value={selectedGroupId ?? ""}
@@ -228,27 +232,26 @@ const IngredientsForm = (props: Props) => {
             handleSelectGroupId(e.target.value ? Number(e.target.value) : null)
           }
           options={ingredientGroups}
-        />
-
-        <SelectBoxNew
-          name="unit"
-          label="単位"
-          value={selectedUnitId ?? ""}
+        /> */}
+        <SelectBox
+          name="group"
+          label="分類"
+          value={selectedGroupId ? String(selectedGroupId) : ""}
           isRequired={true}
-          onChange={(value) =>
-            handleSelectUnitId(value ? Number(value) : null)
-          }
-          options={units}
+          onChange={(value) => {
+            handleSelectGroupId(value ? Number(value) : null);
+          }}
+          options={ingredientGroups}
         />
 
         <SelectBox
           name="unit"
           label="単位"
-          value={selectedUnitId ?? ""}
+          value={selectedUnitId ? String(selectedUnitId) : ""}
           isRequired={true}
-          onChange={(e) =>
-            handleSelectUnitId(e.target.value ? Number(e.target.value) : null)
-          }
+          onChange={(value) => {
+            handleSelectUnitId(value ? Number(value) : null);
+          }}
           options={units}
         />
 

@@ -3,9 +3,14 @@ import { DishIngredient } from "@/types";
 import useSWR from "swr";
 
 const useDishIngredients = () => {
-  const { data, mutate } = useSWR<DishIngredient[]>("api/dish-ingredients", fetcher, {
-    suspense: true,
-  });
+  const { data, mutate } = useSWR<DishIngredient[]>(
+    "api/dish-ingredients",
+    fetcher,
+    {
+      suspense: true,
+      fallbackData: [],
+    }
+  );
   return {
     dishIngredients: data ?? [],
     mutateDishes: mutate,
