@@ -63,7 +63,7 @@ export const dishIngredients = mysqlTable("dish_ingredients", {
   id: int("id").autoincrement().primaryKey(),
   dishId: int("dish_id")
     .notNull()
-    .references(() => dishes.id),
+    .references(() => dishes.id, { onDelete: "cascade" }),
   ingredientId: int("ingredient_id")
     .notNull()
     .references(() => ingredients.id),
@@ -74,7 +74,7 @@ export const dishRecipes = mysqlTable("dish_recipes", {
   id: int("id").autoincrement().primaryKey(),
   dishId: int("dish_id")
     .notNull()
-    .references(() => dishes.id),
+    .references(() => dishes.id, { onDelete: "cascade" }),
   stepNumber: int("step_number").notNull(),
   description: varchar("description", { length: 1000 }).notNull(),
 });
