@@ -37,7 +37,7 @@ export type DishIngredient = {
    id: number
    dishId: number,
    ingredientId: number,
-   quantity: "string", 
+   quantity: string, 
 }
 
 export type DishRecipe = {

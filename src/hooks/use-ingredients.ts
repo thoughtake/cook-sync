@@ -5,7 +5,7 @@ import useSWR from "swr";
 const useIngredients = () => {
   const { data, mutate } = useSWR<Ingredient[]>("api/ingredients", fetcher, {
     suspense: true,
-    fallbackData: [],
+    // fallbackData: [],
   });
   return {
     ingredients: data ?? [],

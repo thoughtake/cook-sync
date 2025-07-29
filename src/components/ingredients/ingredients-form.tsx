@@ -250,7 +250,7 @@ const IngredientsForm = (props: Props) => {
           <InputText
             name="相場"
             label={`${unitLabel}あたりの相場`}
-            value={inputPrice ?? ""}
+            value={inputPrice ? String(inputPrice) : ""}
             isRequired={true}
             onChange={(e) => {
               const value = e.target.value;

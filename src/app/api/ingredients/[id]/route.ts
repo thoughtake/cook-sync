@@ -21,10 +21,10 @@ export const DELETE = async (
 
 export const PUT = async (
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise< {id: string }> }
 ) => {
   try {
-    const id = Number(params.id);
+    const id = Number((await params).id);
 
     if (isNaN(id)) {
       return Response.json({ error: "idが数値ではありません", id }, { status: 400 });

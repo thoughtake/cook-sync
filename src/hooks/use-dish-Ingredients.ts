@@ -8,9 +8,10 @@ const useDishIngredients = () => {
     fetcher,
     {
       suspense: true,
-      fallbackData: [],
+      // // fallbackData: [],
     }
   );
+  console.log(data);
   return {
     dishIngredients: data ?? [],
     mutateDishes: mutate,
