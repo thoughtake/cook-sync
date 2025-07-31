@@ -1,12 +1,6 @@
 import { Dish, DishIngredient, DishRecipe, Ingredient, Unit } from "@/types";
 import Image from "next/image";
-import {
-  memo,
-  SetStateAction,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { memo, SetStateAction, useCallback, useMemo, useState } from "react";
 import InputText from "../common/ui/form/input-text";
 import SelectBox from "../common/ui/form/select-box";
 import IconButton from "../common/ui/button/icon-button";
@@ -201,12 +195,13 @@ const DishForm = (props: Props) => {
     const newDishIngredients = editedDishIngredients
       .filter(
         (ingredient) =>
-          ingredient.ingredientId !== undefined && ingredient !== undefined
+          ingredient.ingredientId !== undefined &&
+          ingredient.quantity !== undefined
       )
       .map((ingredient) => ({
         id: ingredient.id,
         dishId: ingredient.dishId,
-        ingredientId: ingredient.dishId,
+        ingredientId: ingredient.ingredientId,
         quantity: ingredient.quantity,
       }));
 
@@ -227,8 +222,8 @@ const DishForm = (props: Props) => {
         },
         body: JSON.stringify({
           dish: newDish,
-          dishIngredients: newDishIngredients,
-          dishRecipes: newDishRecipes,
+          ingredients: newDishIngredients,
+          recipes: newDishRecipes,
         }),
       });
 
@@ -239,6 +234,9 @@ const DishForm = (props: Props) => {
       }
 
       //取得
+      await mutateDishes();
+      await mutateDishIngredients();
+      await mutateDishRecipes();
     } catch (error) {
       alert("更新に失敗しました");
       console.error(error);
@@ -248,7 +246,16 @@ const DishForm = (props: Props) => {
   if (!editedDish) return;
 
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmitEdit();
+
+        if (props.setIsEditMode) {
+          props.setIsEditMode(false);
+        }
+      }}
+    >
       <div className="relative w-full h-70 mb-3">
         {editedDish.imageUrl && !editedImageIsError ? (
           <Image
