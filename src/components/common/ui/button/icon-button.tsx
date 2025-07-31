@@ -79,6 +79,7 @@ const IconButton = ({
 
   return (
     <button
+      type={onClick ? "button" : "submit"}
       onClick={onClick}
       className={clsx(
         variantMap[variant],

@@ -4,8 +4,8 @@ import { DishSchema } from "@/schemas/dish-schema";
 import { eq } from "drizzle-orm";
 import { deleteHandler } from "../../delete-handler";
 import z from "zod";
-import { DishIngredientSchema } from "@/schemas/dish-ingredient-schema";
-import { DishRecipeSchema } from "@/schemas/dish-recipe-schema";
+import { DishIngredientUpdateSchema } from "@/schemas/dish-ingredient-schema";
+import { DishRecipeUpdateSchema } from "@/schemas/dish-recipe-schema";
 
 export const DELETE = async (
   req: Request,
@@ -36,14 +36,11 @@ export const PUT = async (
     const { dish, ingredients, recipes } = await req.json();
     const parsedDish = DishSchema.safeParse(dish);
     const parsedDishIngredients = z
-    .array(DishIngredientSchema)
+    .array(DishIngredientUpdateSchema)
     .safeParse(ingredients);
-    const parsedDishRecipes = z.array(DishRecipeSchema).safeParse(recipes);
+    const parsedDishRecipes = z.array(DishRecipeUpdateSchema).safeParse(recipes);
     
     if (!parsedDish.success || !parsedDishIngredients.success || !parsedDishRecipes.success) {
-      // console.log(parsedDish.error)
-      // console.log(parsedDishIngredients.error)
-      // console.log(parsedDishRecipes.error)
       return Response.json(
         {
           error: "Invalid data",
@@ -60,7 +57,6 @@ export const PUT = async (
         { status: 400 }
       );
     }
-    // console.log(parsedDishIngredients.data)
 
     await db.transaction(async (tx) => {
       //料理の更新

@@ -102,8 +102,8 @@ const IngredientsForm = (props: Props) => {
     }
   }, [editTarget]);
 
-  //フォームの送信（保存）
-  const handleSubmitSave = async () => {
+  //フォームの送信（新規登録）
+  const handleSubmitCreate = async () => {
     //編集モードでないこと
     if (selectedUnitId === null || selectedGroupId === null || isEditMode)
       return;
@@ -205,7 +205,7 @@ const IngredientsForm = (props: Props) => {
           if (isEditMode) {
             handleSubmitEdit();
           } else {
-            handleSubmitSave();
+            handleSubmitCreate();
           }
         }}
         className="mb-5"

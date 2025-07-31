@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { usePathname } from "next/navigation";
 
 const NavLink = ({ href, label }: { href: string; label: string }) => {
+  // パスを取得
   const pathname = usePathname();
 
   return (

@@ -1,4 +1,4 @@
-import { Dish, DishIngredient, DishRecipe, Ingredient, Unit } from "@/types";
+import { Dish, DishIngredient, DishRecipe, Ingredient } from "@/types";
 import Image from "next/image";
 import { memo, SetStateAction, useCallback, useMemo, useState } from "react";
 import InputText from "../common/ui/form/input-text";
@@ -19,10 +19,10 @@ type EditedDish = Pick<Dish, "isFavorite" | "imageUrl"> &
   Partial<Pick<Dish, "name" | "timeMinutes" | "servings">>;
 
 //材料タイプ（編集用）
-type EditedDishIngredient = Partial<DishIngredient>;
+type EditedDishIngredient = Partial<Omit<DishIngredient, "id">>;
 
 //レシピタイプ（編集用）
-type EditedDishRecipe = Partial<DishRecipe>;
+type EditedDishRecipe = Partial<Omit<DishRecipe, "id">>;
 
 type EditModeProps = {
   isEditMode: true;
@@ -113,7 +113,7 @@ const DishForm = (props: Props) => {
     setEditedDishRecipes,
   ]);
 
-  //PUT可能か判断する
+  //登録可能か判断する
   const isDisabled = useMemo(() => {
     if (editedDish && editedDishIngredients && editedDishRecipes) {
       const dishKeys: (keyof EditedDish)[] = [
@@ -122,11 +122,11 @@ const DishForm = (props: Props) => {
         "servings",
         "isFavorite",
       ];
-      const dishIngredientKeys: (keyof EditedDishIngredient)[] = ["dishId"];
-      const dishRecipeKeys: (keyof EditedDishRecipe)[] = [
-        "dishId",
-        "stepNumber",
-      ];
+      const dishIngredientKeys: (keyof EditedDishIngredient)[] =
+        props.isEditMode ? ["dishId"] : [];
+      const dishRecipeKeys: (keyof EditedDishRecipe)[] = props.isEditMode
+        ? ["dishId", "stepNumber", "description"]
+        : ["stepNumber", "description"];
 
       const hasDishKeys = dishKeys.every((key) => {
         const value = editedDish[key];
@@ -143,7 +143,6 @@ const DishForm = (props: Props) => {
           dishIngredientKeys.every((key) => {
             const value = ingredient[key];
             if (
-              key !== "id" &&
               key !== "dishId" &&
               key !== "ingredientId" &&
               typeof value === "number"
@@ -160,7 +159,7 @@ const DishForm = (props: Props) => {
         editedDishRecipes.every((recipe) =>
           dishRecipeKeys.every((key) => {
             const value = recipe[key];
-            if (key !== "id" && key !== "dishId" && typeof value === "number") {
+            if (key !== "dishId" && typeof value === "number") {
               return value !== 0 && value !== undefined && value !== null;
             } else {
               return value !== "" && value !== undefined && value !== null;
@@ -172,8 +171,76 @@ const DishForm = (props: Props) => {
     } else {
       return true;
     }
-  }, [editedDish, editedDishIngredients, editedDishRecipes]);
+  }, [editedDish, editedDishIngredients, editedDishRecipes, props.isEditMode]);
 
+  //登録(POST)
+  const handleSubmitCreate = async () => {
+    if (
+      props.isEditMode ||
+      isDisabled ||
+      !editedDish ||
+      !editedDishIngredients ||
+      !editedDishRecipes
+    )
+      return;
+
+    const newDish = {
+      name: editedDish.name,
+      timeMinutes: editedDish.timeMinutes,
+      servings: editedDish.servings,
+      isFavorite: editedDish.isFavorite,
+      imageUrl: editedDish.imageUrl,
+    };
+
+    const newDishIngredients = editedDishIngredients
+      .filter(
+        (ingredient) =>
+          ingredient.ingredientId !== undefined &&
+          ingredient.quantity !== undefined
+      )
+      .map((ingredient) => ({
+        ingredientId: ingredient.ingredientId,
+        quantity: ingredient.quantity,
+      }));
+
+    const newDishRecipes = editedDishRecipes
+      .filter((recipe) => recipe.description !== undefined)
+      .map((recipe) => ({
+        stepNumber: recipe.stepNumber,
+        description: recipe.description,
+      }));
+
+    try {
+      const res = await fetch(`api/dishes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dish: newDish,
+          ingredients: newDishIngredients,
+          recipes: newDishRecipes,
+        }),
+      });
+
+      const result = await res.json();
+      
+
+      if (!res.ok) {
+        throw new Error(result.error || "登録に失敗しました。");
+      }
+
+      //取得
+      await mutateDishes();
+      await mutateDishIngredients();
+      await mutateDishRecipes();
+    } catch (error) {
+      alert("登録に失敗しました");
+      console.error(error);
+    }
+  };
+
+  //編集(PUT)
   const handleSubmitEdit = async () => {
     if (
       !props.isEditMode ||
@@ -199,7 +266,6 @@ const DishForm = (props: Props) => {
           ingredient.quantity !== undefined
       )
       .map((ingredient) => ({
-        id: ingredient.id,
         dishId: ingredient.dishId,
         ingredientId: ingredient.ingredientId,
         quantity: ingredient.quantity,
@@ -208,7 +274,6 @@ const DishForm = (props: Props) => {
     const newDishRecipes = editedDishRecipes
       .filter((recipe) => recipe.description !== undefined)
       .map((recipe) => ({
-        id: recipe.id,
         dishId: recipe.dishId,
         stepNumber: recipe.stepNumber,
         description: recipe.description,
@@ -249,7 +314,12 @@ const DishForm = (props: Props) => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        handleSubmitEdit();
+        //編集中かどうかで処理を変える
+        if (props.isEditMode) {
+          handleSubmitEdit();
+        } else {
+          handleSubmitCreate();
+        }
 
         if (props.setIsEditMode) {
           props.setIsEditMode(false);
@@ -520,28 +590,39 @@ const DishForm = (props: Props) => {
           }}
         />
       </div>
-
       <div className="flex gap-4 mt-8">
-        <StandardButton
-          label="編集"
-          variant="filled"
-          color="green"
-          isDisabled={isDisabled}
-          className="flex-1"
-        />
-        <StandardButton
-          label="キャンセル"
-          variant="filled"
-          color="gray"
-          className="flex-1"
-          onClick={() => {
-            if (props.isEditMode && props.setIsEditMode) {
-              props.setIsEditMode(false);
-            }
-            resetEditedContent();
-            scrollTop(0);
-          }}
-        />
+        {props.isEditMode ? (
+          <>
+            <StandardButton
+              label="編集"
+              variant="filled"
+              color="green"
+              isDisabled={isDisabled}
+              className="flex-1"
+            />
+            <StandardButton
+              label="キャンセル"
+              variant="filled"
+              color="gray"
+              className="flex-1"
+              onClick={() => {
+                if (props.setIsEditMode) {
+                  props.setIsEditMode(false);
+                }
+                resetEditedContent();
+                scrollTop(0);
+              }}
+            />
+          </>
+        ) : (
+          <StandardButton
+            label="登録"
+            variant="filled"
+            color="green"
+            isDisabled={isDisabled}
+            className="w-full"
+          />
+        )}
       </div>
     </form>
   );
