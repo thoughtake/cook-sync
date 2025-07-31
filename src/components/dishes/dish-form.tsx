@@ -7,6 +7,7 @@ import IconButton from "../common/ui/button/icon-button";
 import { PlusIcon, Trash2 } from "lucide-react";
 import StandardButton from "../common/ui/button/standard-button";
 import InputTextarea from "../common/ui/form/input-textarea";
+import { useModal } from "@/context/modal-context";
 
 //料理タイプ（編集用）
 type EditedDish = Pick<Dish, "id" | "isFavorite" | "imageUrl"> &
@@ -43,6 +44,9 @@ const DishForm = (props: Props) => {
     isEditMode,
     setIsEditMode,
   } = props;
+
+    //モーダルスクロール用
+      const {scrollTop} = useModal();
 
   //料理（編集用）
   const [editedDish, setEditedDish] = useState<EditedDish | undefined>(dish);
@@ -427,6 +431,7 @@ const DishForm = (props: Props) => {
               setIsEditMode(false)
             }
             resetEditedContent();
+            scrollTop(0);
           }}
         />
       </div>

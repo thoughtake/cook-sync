@@ -17,6 +17,7 @@ import {  useMemo, useState } from "react";
 import IconButton from "../common/ui/button/icon-button";
 import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
 import DishForm from "./dish-form";
+import { useModal } from "@/context/modal-context";
 
 const DishInfo = ({ dishId }: { dishId: number }) => {
   const { dishes, mutateDishes } = useDishes();
@@ -27,6 +28,9 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
   const { ingredients } = useIngredients();
   const { units } = useUnits();
   const [imageIsError, setImageIsError] = useState<boolean>(false);
+
+  //モーダルスクロール用
+    const {scrollTop} = useModal();
 
   //削除
   const deleteConfirm = useDeleteItemWithConfirm({
@@ -272,6 +276,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
               radius="circle"
               onClick={() => {
                 setIsEditMode(true);
+                scrollTop(0);
               }}
             />
             <IconButton

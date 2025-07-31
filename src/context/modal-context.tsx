@@ -1,18 +1,21 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useRef, useState } from "react";
 
 type ContextType = {
   showModal: (content: ReactNode) => void;
   closeModal: () => void;
   closeModalAll: () => void;
   contents: ReactNode[];
+  setContentRef: (index: number, el: HTMLDivElement | null) => void;
+  scrollTop: (index: number) => void;
 };
 
 const ModalContext = createContext<ContextType | undefined>(undefined);
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [contents, setContents] = useState<ReactNode[]>([]);
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const showModal = (content: ReactNode) => {
     setContents((prev) => [...prev, content]);
@@ -26,9 +29,17 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     setContents([]);
   }
 
+  const setContentRef = (index: number, el: HTMLDivElement | null) => {
+    contentRefs.current[index] = el;
+  }
+
+  const scrollTop = (index: number) => {
+    contentRefs.current[index]?.scrollTo({top: 0, behavior: "auto"})
+  }
+
   return (
     <ModalContext.Provider
-      value={{ showModal, closeModal, closeModalAll, contents }}
+      value={{ showModal, closeModal, closeModalAll, contents, setContentRef, scrollTop }}
     >
       {children}
     </ModalContext.Provider>
