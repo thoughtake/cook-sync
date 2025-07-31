@@ -3,24 +3,20 @@ import useDishIngredients from "@/hooks/use-dish-Ingredients";
 import useDishRecipes from "@/hooks/use-dish-recipes";
 import useIngredients from "@/hooks/use-ingredients";
 import useUnits from "@/hooks/use-units";
-import { Dish, DishIngredient, DishRecipe, Ingredient } from "@/types";
+import { Dish, DishIngredient, DishRecipe} from "@/types";
 import {
   BadgeJapaneseYen,
   Heart,
   Pencil,
-  Plus,
-  PlusIcon,
   Timer,
   Trash2,
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {  useMemo, useState } from "react";
 import IconButton from "../common/ui/button/icon-button";
 import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
-import StandardButton from "../common/ui/button/standard-button";
-import InputText from "../common/ui/form/input-text";
-import SelectBox from "../common/ui/form/select-box";
+import DishForm from "./dish-form";
 
 const DishInfo = ({ dishId }: { dishId: number }) => {
   const { dishes, mutateDishes } = useDishes();
@@ -55,37 +51,8 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
 
   /////編集/////
 
-  //材料タイプ（編集用）
-  type EditedDishIngredient = Pick<DishIngredient, "dishId"> &
-    Partial<Omit<DishIngredient, "name">>;
-
-  //レシピタイプ（編集用）
-  type EditedDishRecipe = Pick<DishRecipe, "dishId"> & Partial<Omit<DishRecipe, "dishId">>;
-
   //編集中かどうか
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-
-  //料理（編集用）
-  const [editedDish, setEditedDish] = useState<Dish | undefined>(dish);
-
-  //材料（編集用）
-  const [editedDishIngredients, setEditedDishIngredients] =
-    useState<EditedDishIngredient[]>(ingredientsForDish);
-
-  //レシピ（編集用）
-  const [editedDishRecipes, setEditedDishRecipes] =
-    useState<EditedDishRecipe[]>(recipesForDish);
-
-  //編集画像のエラー真偽
-  const [editedImageIsError, setEditedImageIsError] = useState<boolean>(false);
-
-  //セレクト用オプション（既存の材料を除く）
-  const ingredientsOption = useMemo<Ingredient[]>(() => {
-    return ingredients.filter(
-      (i) => !editedDishIngredients.some((edi) => edi.ingredientId === i.id)
-    );
-  }, [ingredients, editedDishIngredients]);
-
 
   // const isDishLoaded = () => {
   //   return (
@@ -131,19 +98,6 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
   //   );
   // };
 
-  const resetEditedContent = useCallback(() => {
-    setEditedDish(dish);
-    setEditedDishIngredients(ingredientsForDish);
-    setEditedDishRecipes(recipesForDish);
-  }, [
-    dish,
-    ingredientsForDish,
-    recipesForDish,
-    setEditedDish,
-    setEditedDishIngredients,
-    setEditedDishRecipes,
-  ]);
-
   //お気に入り登録
   const handleClickFavorite = async () => {
     if (!dish) return;
@@ -172,226 +126,22 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
     }
   };
 
-  if (!dish || !editedDish) return;
+  if (!dish) return;
 
   return (
     <>
       {/* 編集中かどうかで分岐 */}
       {isEditMode ? (
-        <>
-          <form onSubmit={(e) => e.preventDefault()}>
-            <div className="relative w-full h-70 mb-3">
-              {editedDish.imageUrl && !editedImageIsError ? (
-                <Image
-                  src={editedDish.imageUrl}
-                  alt={editedDish.name}
-                  fill
-                  className="object-contain"
-                  onError={() => setEditedImageIsError(true)}
-                />
-              ) : (
-                <div className="flex items-center justify-center bg-cancel text-white w-full h-full">
-                  <span className="font-bold text-4xl">No Image</span>
-                </div>
-              )}
-            </div>
-            <InputText
-              name="imageUrl"
-              label="画像のURL"
-              value={editedDish.imageUrl ? editedDish.imageUrl : ""}
-              isRequired={false}
-              onChange={(e) => {
-                setEditedImageIsError(false);
-                setEditedDish({ ...editedDish, imageUrl: e.target.value });
-              }}
-            />
-            {/* 料理名 */}
-            <InputText
-              name="name"
-              label="料理名"
-              value={editedDish.name ? editedDish.name : ""}
-              isRequired={true}
-              onChange={(e) => {
-                setEditedDish({ ...editedDish, name: e.target.value });
-              }}
-            />
-
-            {/* 所要時間 */}
-            <InputText
-              name="timeMinutes"
-              label="所要時間"
-              value={
-                editedDish.timeMinutes ? String(editedDish.timeMinutes) : ""
-              }
-              isRequired={true}
-              onChange={(e) => {
-                setEditedDish({
-                  ...editedDish,
-                  timeMinutes: Number(e.target.value),
-                });
-              }}
-              suffix="分"
-              className="w-1/3 text-right"
-            />
-
-            {/* 分量 */}
-            <InputText
-              name="servings"
-              label="分量"
-              value={editedDish.servings ? String(editedDish.servings) : ""}
-              isRequired={true}
-              onChange={(e) => {
-                setEditedDish({
-                  ...editedDish,
-                  servings: Number(e.target.value),
-                });
-              }}
-              suffix="人前"
-              className="w-1/3 text-right"
-            />
-
-            <h3 className="flex justify-center items-center text-xl font-bold  bg-primary py-1 mb-8">
-              <span className="mr-3">材料</span>
-              <span className="bg-attention text-sm text-white px-1 py-1 rounded">
-                必須
-              </span>
-            </h3>
-            <ul>
-              {editedDishIngredients.map((edi, index) => {
-                const targetIngredient = ingredients.find(
-                  (ingredient) => edi.ingredientId === ingredient.id
-                );
-                const targetUnit = units.find(
-                  (unit) => targetIngredient?.unitId === unit.id
-                );
-
-                return (
-                  <li key={index} className="flex justify-between">
-                    <SelectBox
-                      name={`ingredient-${index}`}
-                      label="料理"
-                      value={edi.ingredientId ? String(edi.ingredientId) : ""}
-                      isRequired={false}
-                      onChange={(value) => {
-                        const newIngredients = editedDishIngredients.map((ingredient, i) =>
-                          i === index
-                            ? { ...ingredient, ingredientId: Number(value) }
-                            : ingredient
-                        );
-                        setEditedDishIngredients(newIngredients);
-                      }}
-                      options={[
-                        ...(targetIngredient ? [{id: targetIngredient.id, name: targetIngredient.name}] : []),
-                        ...ingredientsOption.map((ingredient) => ({
-                        id: ingredient.id,
-                        name: ingredient.name,
-                      }))
-                      ]}
-                      className="w-100"
-                      showLabel={false}
-                    />
-                    <div className="flex items-center justify-end flex-1">
-                      {targetUnit && (
-                        <div className="flex items-center">
-                          <InputText
-                            name={`ingredient-quantity-${index}`}
-                            label=""
-                            value={edi.quantity ? edi.quantity : ""}
-                            isRequired={false}
-                            onChange={(e) => {
-                              const isValid = /^\d+(\.\d{0,2})?$/.test(e.target.value)
-                              if (isValid) {
-                                const newIngredients = editedDishIngredients.map(
-                                  (ingredient, i) =>
-                                    i === index
-                                      ? { ...ingredient, quantity: e.target.value }
-                                      : ingredient
-                                );
-                                setEditedDishIngredients(newIngredients);
-                              } 
-                            }}
-                            className="text-right mr-3"
-                            showLabel={false}
-                          />
-                          <div className="mb-7 w-10">{targetUnit.name}</div>
-                        </div>
-                      )}
-                      {/* 削除ボタン */}
-                      <IconButton
-                        icon={Trash2}
-                        variant="filled"
-                        size="sm"
-                        radius="circle"
-                        color="red"
-                        onClick={() => {
-                          const newIngredients = [...editedDishIngredients]
-                          newIngredients.splice(index,1)
-                          setEditedDishIngredients(newIngredients);
-                        }}
-                        className="mb-7"
-                      />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="flex justify-start">
-              <StandardButton
-                label="追加"
-                variant="outline"
-                color="black"
-                size="sm"
-                icon={PlusIcon}
-                onClick={() => {
-                  setEditedDishIngredients([
-                    ...editedDishIngredients,
-                    {
-                      dishId: dishId,
-                    },
-                  ]);
-                }}
-              />
-            </div>
-            <h3 className="text-xl font-bold text-center bg-primary py-1 mb-3 mt-10">
-              手順
-            </h3>
-            <ul>
-              {editedDishRecipes.map((edr, index) => (
-                <li
-                  key={index}
-                  className="flex border-b border-border text-xl py-8"
-                >
-                  <div className="w-13">
-                    <span className="flex justify-center items-center bg-primary w-8 h-8 font-bold rounded-full">
-                      {edr.stepNumber}
-                    </span>
-                  </div>
-                  <p className="flex-1">{edr.description}</p>
-                </li>
-              ))}
-            </ul>
-
-            <div className="flex gap-4">
-              <StandardButton
-                label="編集"
-                variant="filled"
-                color="green"
-                isDisabled={true}
-                className="flex-1"
-              />
-              <StandardButton
-                label="キャンセル"
-                variant="filled"
-                color="gray"
-                className="flex-1"
-                onClick={() => {
-                  setIsEditMode(false);
-                  resetEditedContent();
-                }}
-              />
-            </div>
-          </form>
-        </>
+        <DishForm
+        dishId={dishId}
+          dish={dish}
+          ingredientsForDish={ingredientsForDish}
+          recipesForDish={recipesForDish}
+          ingredients={ingredients}
+          units={units}
+          isEditMode={isEditMode}
+          setIsEditMode={setIsEditMode}
+        />
       ) : (
         ///////////////////
         // 編集中でない場合
@@ -486,7 +236,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
                 targetUnit && (
                   <li
                     key={ifd.id}
-                    className="flex justify-between border-b border-border text-xl py-3"
+                    className="flex justify-between border-b border-border  py-3"
                   >
                     <div>{targetIngredient?.name}</div>
                     <div>
@@ -503,10 +253,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
           </h3>
           <ul>
             {recipesForDish.map((rfd) => (
-              <li
-                key={rfd.id}
-                className="flex border-b border-border text-xl py-8"
-              >
+              <li key={rfd.id} className="flex border-b border-border py-8">
                 <div className="w-13">
                   <span className="flex justify-center items-center bg-primary w-8 h-8 font-bold rounded-full">
                     {rfd.stepNumber}
