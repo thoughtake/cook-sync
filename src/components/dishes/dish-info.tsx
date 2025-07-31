@@ -3,17 +3,19 @@ import useDishIngredients from "@/hooks/use-dish-Ingredients";
 import useDishRecipes from "@/hooks/use-dish-recipes";
 import useIngredients from "@/hooks/use-ingredients";
 import useUnits from "@/hooks/use-units";
-import { Dish, DishIngredient, DishRecipe } from "@/types";
+import { Dish, DishIngredient, DishRecipe, Ingredient } from "@/types";
 import {
   BadgeJapaneseYen,
   Heart,
   Pencil,
+  Plus,
+  PlusIcon,
   Timer,
   Trash2,
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import IconButton from "../common/ui/button/icon-button";
 import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
 import StandardButton from "../common/ui/button/standard-button";
@@ -29,11 +31,6 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
   const { ingredients } = useIngredients();
   const { units } = useUnits();
   const [imageIsError, setImageIsError] = useState<boolean>(false);
-
-  //編集
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
-
-
 
   //削除
   const deleteConfirm = useDeleteItemWithConfirm({
@@ -56,19 +53,45 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
     return dishRecipes.filter((r) => r.dishId === dish?.id);
   }, [dishRecipes, dish]);
 
+  /////編集/////
+
+  //材料タイプ（編集用）
+  type EditedDishIngredient = Pick<DishIngredient, "dishId"> &
+    Partial<Omit<DishIngredient, "name">>;
+
+  //レシピタイプ（編集用）
+  type EditedDishRecipe = Pick<DishRecipe, "dishId"> & Partial<Omit<DishRecipe, "dishId">>;
+
+  //編集中かどうか
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+
+  //料理（編集用）
   const [editedDish, setEditedDish] = useState<Dish | undefined>(dish);
-  const [editedDishIngredients, setEditedDishIngredients] = useState<
-    DishIngredient[]
-  >(ingredientsForDish);
-  const [editedDishRecipes, setEditedDishRecipes] = useState<DishRecipe[]>(recipesForDish);
+
+  //材料（編集用）
+  const [editedDishIngredients, setEditedDishIngredients] =
+    useState<EditedDishIngredient[]>(ingredientsForDish);
+
+  //レシピ（編集用）
+  const [editedDishRecipes, setEditedDishRecipes] =
+    useState<EditedDishRecipe[]>(recipesForDish);
+
+  //編集画像のエラー真偽
   const [editedImageIsError, setEditedImageIsError] = useState<boolean>(false);
 
-
-  const isDishLoaded = () => {
-    return (
-      dish && ingredientsForDish.length !== 0 && recipesForDish.length !== 0
+  //セレクト用オプション（既存の材料を除く）
+  const ingredientsOption = useMemo<Ingredient[]>(() => {
+    return ingredients.filter(
+      (i) => !editedDishIngredients.some((edi) => edi.ingredientId === i.id)
     );
-  };
+  }, [ingredients, editedDishIngredients]);
+
+
+  // const isDishLoaded = () => {
+  //   return (
+  //     dish && ingredientsForDish.length !== 0 && recipesForDish.length !== 0
+  //   );
+  // };
 
   //1人前あたりの相場を計算
   const pricePerServing = useMemo<number | null>(() => {
@@ -100,22 +123,6 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
     return Math.round(totalPrice / dish.servings);
   }, [ingredientsForDish, ingredients, units, dish]);
 
-  // //編集用の初期値を取得
-  // useEffect(() => {
-  //   if (!dish) return;
-  //   setEditedDish({ ...dish });
-  // }, [dish]);
-
-  // useEffect(() => {
-  //   if (ingredientsForDish.length === 0) return;
-  //   setEditedDishIngredients([...ingredientsForDish]);
-  // }, [ingredientsForDish]);
-
-  // useEffect(() => {
-  //   if (recipesForDish.length === 0) return;
-  //   setEditedDishRecipes([...recipesForDish]);
-  // }, [recipesForDish]);
-
   // const isEditedDishLoaded = () => {
   //   return (
   //     !editedDish &&
@@ -124,13 +131,18 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
   //   );
   // };
 
-  // const resetEditedContent = useCallback(() => {
-  //   if (!isDishLoaded) return 
-  //   setEditedDish(dish);
-  //   setEditedDishIngredients([...ingredientsForDish]);
-  //   setEditedDishRecipes([...recipesForDish]);
-  // }, [setEditedDish, setEditedDishIngredients, setEditedDishRecipes]);
-
+  const resetEditedContent = useCallback(() => {
+    setEditedDish(dish);
+    setEditedDishIngredients(ingredientsForDish);
+    setEditedDishRecipes(recipesForDish);
+  }, [
+    dish,
+    ingredientsForDish,
+    recipesForDish,
+    setEditedDish,
+    setEditedDishIngredients,
+    setEditedDishRecipes,
+  ]);
 
   //お気に入り登録
   const handleClickFavorite = async () => {
@@ -167,7 +179,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
       {/* 編集中かどうかで分岐 */}
       {isEditMode ? (
         <>
-          <form>
+          <form onSubmit={(e) => e.preventDefault()}>
             <div className="relative w-full h-70 mb-3">
               {editedDish.imageUrl && !editedImageIsError ? (
                 <Image
@@ -254,85 +266,107 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
                 );
 
                 return (
-                  targetUnit && (
-                    <li key={edi.id} className="flex justify-between">
-                      <SelectBox
-                        name={`ingredient-${index}`}
-                        label=""
-                        value={String(edi.ingredientId)}
-                        isRequired={false}
-                        onChange={(value) => {
-                          const newIngredients = editedDishIngredients.map(
-                            (i) =>
-                              i.id === edi.id
-                                ? { ...i, ingredientId: Number(value) }
-                                : i
-                          );
-                          setEditedDishIngredients(newIngredients);
-                        }}
-                        options={ingredients.map((ingredient) => ({
-                          id: ingredient.id,
-                          name: ingredient.name,
-                        }))}
-                        className="w-100"
-                        showLabel={false}
-                      />
-                      <div className="flex items-center justify-end flex-1">
+                  <li key={index} className="flex justify-between">
+                    <SelectBox
+                      name={`ingredient-${index}`}
+                      label="料理"
+                      value={edi.ingredientId ? String(edi.ingredientId) : ""}
+                      isRequired={false}
+                      onChange={(value) => {
+                        const newIngredients = editedDishIngredients.map((ingredient, i) =>
+                          i === index
+                            ? { ...ingredient, ingredientId: Number(value) }
+                            : ingredient
+                        );
+                        setEditedDishIngredients(newIngredients);
+                      }}
+                      options={[
+                        ...(targetIngredient ? [{id: targetIngredient.id, name: targetIngredient.name}] : []),
+                        ...ingredientsOption.map((ingredient) => ({
+                        id: ingredient.id,
+                        name: ingredient.name,
+                      }))
+                      ]}
+                      className="w-100"
+                      showLabel={false}
+                    />
+                    <div className="flex items-center justify-end flex-1">
+                      {targetUnit && (
                         <div className="flex items-center">
                           <InputText
                             name={`ingredient-quantity-${index}`}
                             label=""
-                            value={String(edi.quantity)}
+                            value={edi.quantity ? edi.quantity : ""}
                             isRequired={false}
-                            onChange={(value) => {
-                              const newIngredients = editedDishIngredients.map(
-                                (i) =>
-                                  i.id === edi.id
-                                    ? { ...i, quantity: String(value) }
-                                    : i
-                              );
-                              setEditedDishIngredients(newIngredients);
+                            onChange={(e) => {
+                              const isValid = /^\d+(\.\d{0,2})?$/.test(e.target.value)
+                              if (isValid) {
+                                const newIngredients = editedDishIngredients.map(
+                                  (ingredient, i) =>
+                                    i === index
+                                      ? { ...ingredient, quantity: e.target.value }
+                                      : ingredient
+                                );
+                                setEditedDishIngredients(newIngredients);
+                              } 
                             }}
                             className="text-right mr-3"
                             showLabel={false}
                           />
                           <div className="mb-7 w-10">{targetUnit.name}</div>
                         </div>
-                        <IconButton
-                          icon={Trash2}
-                          variant="filled"
-                          size="sm"
-                          radius="circle"
-                          color="red"
-                          onClick={() => {
-                            const newIngredients = editedDishIngredients.filter(
-                              (i) => i.id !== edi.id
-                            );
-                            setEditedDishIngredients(newIngredients);
-                          }}
-                          className="mb-7"
-                        />
-                      </div>
-                    </li>
-                  )
+                      )}
+                      {/* 削除ボタン */}
+                      <IconButton
+                        icon={Trash2}
+                        variant="filled"
+                        size="sm"
+                        radius="circle"
+                        color="red"
+                        onClick={() => {
+                          const newIngredients = [...editedDishIngredients]
+                          newIngredients.splice(index,1)
+                          setEditedDishIngredients(newIngredients);
+                        }}
+                        className="mb-7"
+                      />
+                    </div>
+                  </li>
                 );
               })}
             </ul>
+            <div className="flex justify-start">
+              <StandardButton
+                label="追加"
+                variant="outline"
+                color="black"
+                size="sm"
+                icon={PlusIcon}
+                onClick={() => {
+                  setEditedDishIngredients([
+                    ...editedDishIngredients,
+                    {
+                      dishId: dishId,
+                    },
+                  ]);
+                }}
+              />
+            </div>
             <h3 className="text-xl font-bold text-center bg-primary py-1 mb-3 mt-10">
               手順
             </h3>
             <ul>
-              {recipesForDish.map((rfd) => (
+              {editedDishRecipes.map((edr, index) => (
                 <li
-                  key={rfd.id}
+                  key={index}
                   className="flex border-b border-border text-xl py-8"
                 >
                   <div className="w-13">
                     <span className="flex justify-center items-center bg-primary w-8 h-8 font-bold rounded-full">
-                      {rfd.stepNumber}
+                      {edr.stepNumber}
                     </span>
                   </div>
-                  <p className="flex-1">{rfd.description}</p>
+                  <p className="flex-1">{edr.description}</p>
                 </li>
               ))}
             </ul>
@@ -352,6 +386,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
                 className="flex-1"
                 onClick={() => {
                   setIsEditMode(false);
+                  resetEditedContent();
                 }}
               />
             </div>

@@ -11,7 +11,6 @@ const useDishIngredients = () => {
       // // fallbackData: [],
     }
   );
-  console.log(data);
   return {
     dishIngredients: data ?? [],
     mutateDishes: mutate,

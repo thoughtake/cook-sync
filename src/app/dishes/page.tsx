@@ -1,6 +1,6 @@
 "use client";
 
-import DishInfo from "@/components/dishes/dishes-info";
+import DishInfo from "@/components/dishes/dish-info";
 import { useModal } from "@/context/modal-context";
 import useDishes from "@/hooks/use-dishes";
 import { Timer } from "lucide-react";

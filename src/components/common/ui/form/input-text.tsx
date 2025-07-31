@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { ComponentProps } from "react";
+import { ComponentProps, memo } from "react";
 
 type Props = {
   name: string;
@@ -23,6 +23,7 @@ const InputText = (props: Props) => {
     className = "w-full",
     showLabel = true,
   } = props;
+
 
   return (
     <div className="mb-7">
@@ -52,4 +53,4 @@ const InputText = (props: Props) => {
   );
 };
 
-export default InputText;
+export default memo(InputText);

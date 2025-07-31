@@ -1,7 +1,7 @@
 import * as Select from "@radix-ui/react-select";
 import clsx from "clsx";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 type Props = {
   name: string;
@@ -26,11 +26,14 @@ const SelectBox = (props: Props) => {
     showLabel = true,
   } = props;
 
+
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredOptions = options.filter((option) => {
-    return option.name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredOptions = useMemo(() => {
+    return options.filter((option) => {
+      return option.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [options, searchTerm]);
 
   return (
     <div className="mb-7">
@@ -113,4 +116,4 @@ const SelectBox = (props: Props) => {
   );
 };
 
-export default SelectBox;
+export default memo(SelectBox);
