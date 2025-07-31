@@ -21,7 +21,6 @@ import { useModal } from "@/context/modal-context";
 
 const DishInfo = ({ dishId }: { dishId: number }) => {
   const { dishes, mutateDishes } = useDishes();
-  // const dish = dishes.find((dish) => dish.id === dishId);
   const { dishIngredients } = useDishIngredients();
   const { dishRecipes } = useDishRecipes();
 
@@ -141,8 +140,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
           dish={dish}
           ingredientsForDish={ingredientsForDish}
           recipesForDish={recipesForDish}
-          ingredients={ingredients}
-          units={units}
+          // units={units}
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
         />

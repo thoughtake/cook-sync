@@ -9,7 +9,7 @@ const useDishRecipes = () => {
   });
   return {
     dishRecipes: data ?? [],
-    mutateDishes: mutate,
+    mutateDishRecipes: mutate,
   };
 };
 

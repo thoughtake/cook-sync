@@ -1,6 +1,12 @@
 import { Dish, DishIngredient, DishRecipe, Ingredient, Unit } from "@/types";
 import Image from "next/image";
-import { memo, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import InputText from "../common/ui/form/input-text";
 import SelectBox from "../common/ui/form/select-box";
 import IconButton from "../common/ui/button/icon-button";
@@ -8,56 +14,75 @@ import { PlusIcon, Trash2 } from "lucide-react";
 import StandardButton from "../common/ui/button/standard-button";
 import InputTextarea from "../common/ui/form/input-textarea";
 import { useModal } from "@/context/modal-context";
+import useIngredients from "@/hooks/use-ingredients";
+import useDishes from "@/hooks/use-dishes";
+import useDishIngredients from "@/hooks/use-dish-Ingredients";
+import useDishRecipes from "@/hooks/use-dish-recipes";
+import useUnits from "@/hooks/use-units";
 
 //料理タイプ（編集用）
-type EditedDish = Pick<Dish, "id" | "isFavorite" | "imageUrl"> &
+type EditedDish = Pick<Dish, "isFavorite" | "imageUrl"> &
   Partial<Pick<Dish, "name" | "timeMinutes" | "servings">>;
 
 //材料タイプ（編集用）
-type EditedDishIngredient = Pick<DishIngredient, "dishId"> &
-  Partial<Omit<DishIngredient, "name">>;
+type EditedDishIngredient = Partial<DishIngredient>;
 
 //レシピタイプ（編集用）
-type EditedDishRecipe = Pick<DishRecipe, "dishId"> &
-  Partial<Omit<DishRecipe, "dishId">>;
+type EditedDishRecipe = Partial<DishRecipe>;
 
-type Props = {
+type EditModeProps = {
+  isEditMode: true;
   dishId: number;
   dish: Dish;
   ingredientsForDish: DishIngredient[];
   recipesForDish: DishRecipe[];
-  ingredients: Ingredient[];
-  units: Unit[];
-  isEditMode: boolean;
-  setIsEditMode?: React.Dispatch<SetStateAction<boolean>>;
+  setIsEditMode: React.Dispatch<SetStateAction<boolean>>;
 };
 
+type CreateModeProps = {
+  isEditMode: false;
+  dishId?: undefined;
+  dish?: undefined;
+  ingredientsForDish?: undefined;
+  recipesForDish?: undefined;
+  setIsEditMode?: undefined;
+};
+
+type Props = EditModeProps | CreateModeProps;
+
 const DishForm = (props: Props) => {
+  const { mutateDishes } = useDishes();
+  const { mutateDishIngredients } = useDishIngredients();
+  const { mutateDishRecipes } = useDishRecipes();
 
-  const {
-    dishId,
-    dish,
-    ingredientsForDish,
-    recipesForDish,
-    ingredients,
-    units,
-    isEditMode,
-    setIsEditMode,
-  } = props;
+  const { ingredients } = useIngredients();
+  const { units } = useUnits();
 
-    //モーダルスクロール用
-      const {scrollTop} = useModal();
+  //モーダルスクロール用
+  const { scrollTop } = useModal();
 
   //料理（編集用）
-  const [editedDish, setEditedDish] = useState<EditedDish | undefined>(dish);
+  const [editedDish, setEditedDish] = useState<EditedDish>(
+    props.dish
+      ? props.dish
+      : {
+          name: "",
+          timeMinutes: undefined,
+          servings: undefined,
+          isFavorite: false,
+          imageUrl: undefined,
+        }
+  );
 
   //材料（編集用）
-  const [editedDishIngredients, setEditedDishIngredients] =
-    useState<EditedDishIngredient[]>(ingredientsForDish);
+  const [editedDishIngredients, setEditedDishIngredients] = useState<
+    EditedDishIngredient[]
+  >(props.ingredientsForDish ? props.ingredientsForDish : []);
 
   //レシピ（編集用）
-  const [editedDishRecipes, setEditedDishRecipes] =
-    useState<EditedDishRecipe[]>(recipesForDish);
+  const [editedDishRecipes, setEditedDishRecipes] = useState<
+    EditedDishRecipe[]
+  >(props.recipesForDish ? props.recipesForDish : []);
 
   //編集画像のエラー真偽
   const [editedImageIsError, setEditedImageIsError] = useState<boolean>(false);
@@ -70,13 +95,25 @@ const DishForm = (props: Props) => {
   }, [ingredients, editedDishIngredients]);
 
   const resetEditedContent = useCallback(() => {
-    setEditedDish(dish);
-    setEditedDishIngredients(ingredientsForDish);
-    setEditedDishRecipes(recipesForDish);
+    setEditedDish(
+      props.dish
+        ? props.dish
+        : {
+            name: "",
+            timeMinutes: undefined,
+            servings: undefined,
+            isFavorite: false,
+            imageUrl: undefined,
+          }
+    );
+    setEditedDishIngredients(
+      props.ingredientsForDish ? props.ingredientsForDish : []
+    );
+    setEditedDishRecipes(props.recipesForDish ? props.recipesForDish : []);
   }, [
-    dish,
-    ingredientsForDish,
-    recipesForDish,
+    props.dish,
+    props.ingredientsForDish,
+    props.recipesForDish,
     setEditedDish,
     setEditedDishIngredients,
     setEditedDishRecipes,
@@ -85,8 +122,7 @@ const DishForm = (props: Props) => {
   //PUT可能か判断する
   const isDisabled = useMemo(() => {
     if (editedDish && editedDishIngredients && editedDishRecipes) {
-      const dishKeys: (keyof Dish)[] = [
-        "id",
+      const dishKeys: (keyof EditedDish)[] = [
         "name",
         "timeMinutes",
         "servings",
@@ -100,7 +136,7 @@ const DishForm = (props: Props) => {
 
       const hasDishKeys = dishKeys.every((key) => {
         const value = editedDish[key];
-        if (key !== "id" && typeof value === "number") {
+        if (typeof value === "number") {
           return value !== 0 && value !== undefined && value !== null;
         } else {
           return value !== "" && value !== undefined && value !== null;
@@ -143,6 +179,71 @@ const DishForm = (props: Props) => {
       return true;
     }
   }, [editedDish, editedDishIngredients, editedDishRecipes]);
+
+  const handleSubmitEdit = async () => {
+    if (
+      !props.isEditMode ||
+      isDisabled ||
+      !editedDish ||
+      !editedDishIngredients ||
+      !editedDishRecipes
+    )
+      return;
+
+    const newDish = {
+      name: editedDish.name,
+      timeMinutes: editedDish.timeMinutes,
+      servings: editedDish.servings,
+      isFavorite: editedDish.isFavorite,
+      imageUrl: editedDish.imageUrl,
+    };
+
+    const newDishIngredients = editedDishIngredients
+      .filter(
+        (ingredient) =>
+          ingredient.ingredientId !== undefined && ingredient !== undefined
+      )
+      .map((ingredient) => ({
+        id: ingredient.id,
+        dishId: ingredient.dishId,
+        ingredientId: ingredient.dishId,
+        quantity: ingredient.quantity,
+      }));
+
+    const newDishRecipes = editedDishRecipes
+      .filter((recipe) => recipe.description !== undefined)
+      .map((recipe) => ({
+        id: recipe.id,
+        dishId: recipe.dishId,
+        stepNumber: recipe.stepNumber,
+        description: recipe.description,
+      }));
+
+    try {
+      const res = await fetch(`api/dishes/${props.dishId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dish: newDish,
+          dishIngredients: newDishIngredients,
+          dishRecipes: newDishRecipes,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "更新に失敗しました。");
+      }
+
+      //取得
+    } catch (error) {
+      alert("更新に失敗しました");
+      console.error(error);
+    }
+  };
 
   if (!editedDish) return;
 
@@ -329,9 +430,7 @@ const DishForm = (props: Props) => {
           onClick={() => {
             setEditedDishIngredients([
               ...editedDishIngredients,
-              {
-                dishId: dishId,
-              },
+              props.dishId ? { dishId: props.dishId } : {},
             ]);
           }}
         />
@@ -404,10 +503,12 @@ const DishForm = (props: Props) => {
           onClick={() => {
             setEditedDishRecipes([
               ...editedDishRecipes,
-              {
-                dishId: dishId,
-                stepNumber: editedDishRecipes.length + 1,
-              },
+              props.dishId
+                ? {
+                    dishId: props.dishId,
+                    stepNumber: editedDishRecipes.length + 1,
+                  }
+                : { stepNumber: editedDishRecipes.length + 1 },
             ]);
           }}
         />
@@ -427,8 +528,8 @@ const DishForm = (props: Props) => {
           color="gray"
           className="flex-1"
           onClick={() => {
-            if (setIsEditMode) {
-              setIsEditMode(false)
+            if (props.isEditMode && props.setIsEditMode) {
+              props.setIsEditMode(false);
             }
             resetEditedContent();
             scrollTop(0);

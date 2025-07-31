@@ -154,7 +154,6 @@ const IngredientsForm = (props: Props) => {
 
     // 新しい材料を作成
     const newIngredient = {
-      // id: targetId,
       name: inputName,
       ingredientGroupId: Number(selectedGroupId),
       unitId: Number(selectedUnitId),

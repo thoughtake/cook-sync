@@ -13,7 +13,7 @@ const useDishIngredients = () => {
   );
   return {
     dishIngredients: data ?? [],
-    mutateDishes: mutate,
+    mutateDishIngredients: mutate,
   };
 };
 
