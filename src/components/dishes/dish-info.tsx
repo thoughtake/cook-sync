@@ -107,7 +107,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
     const newFavorite = { ...dish, isFavorite: !dish.isFavorite };
 
     try {
-      const res = await fetch(`api/dishes/${dish.id}`, {
+      const res = await fetch(`api/dishes/${dish.id}/favorite`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
