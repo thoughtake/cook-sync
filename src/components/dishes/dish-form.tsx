@@ -53,7 +53,7 @@ const DishForm = (props: Props) => {
   const { units } = useUnits();
 
   //モーダルスクロール用
-  const { scrollTop } = useModal();
+  const { closeModal ,scrollTop } = useModal();
 
   //料理（編集用）
   const [editedDish, setEditedDish] = useState<EditedDish>(
@@ -319,6 +319,7 @@ const DishForm = (props: Props) => {
           handleSubmitEdit();
         } else {
           handleSubmitCreate();
+          closeModal();
         }
 
         if (props.setIsEditMode) {
