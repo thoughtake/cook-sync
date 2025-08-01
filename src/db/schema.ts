@@ -17,13 +17,13 @@ export const ingredients = mysqlTable("ingredients", {
   unitId: int("unit_id")
     .notNull()
     .references(() => units.id),
-  pricePerUnit: int("price_per_unit"),
+  pricePerUnit: int("price_per_unit").notNull(),
 });
 
 export const units = mysqlTable("units", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  amountPerUnit: int("amount_per_unit"),
+  amountPerUnit: int("amount_per_unit").notNull(),
 });
 
 export const ingredientGroups = mysqlTable("ingredient_groups", {
@@ -53,9 +53,8 @@ export const dishes = mysqlTable("dishes", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   timeMinutes: int("time_minutes").notNull(),
-  // energyKcal: int("energy_kcal").notNull(),
   servings: int("servings").notNull(),
-  isFavorite: boolean("is_favorite").default(false),
+  isFavorite: boolean("is_favorite").default(false).notNull(),
   imageUrl: varchar("image_url", { length: 1000 }),
 });
 
