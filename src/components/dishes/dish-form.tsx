@@ -53,7 +53,7 @@ const DishForm = (props: Props) => {
   const { units } = useUnits();
 
   //モーダルスクロール用
-  const { closeModal ,scrollTop } = useModal();
+  const { closeModal, scrollTop } = useModal();
 
   //料理（編集用）
   const [editedDish, setEditedDish] = useState<EditedDish>(
@@ -115,6 +115,9 @@ const DishForm = (props: Props) => {
 
   //登録可能か判断する
   const isDisabled = useMemo(() => {
+    //チェックするキーを定義
+
+    //料理
     if (editedDish && editedDishIngredients && editedDishRecipes) {
       const dishKeys: (keyof EditedDish)[] = [
         "name",
@@ -122,12 +125,17 @@ const DishForm = (props: Props) => {
         "servings",
         "isFavorite",
       ];
+
+      //材料：編集中かどうかでチェック内容を変える
       const dishIngredientKeys: (keyof EditedDishIngredient)[] =
         props.isEditMode ? ["dishId"] : [];
-      const dishRecipeKeys: (keyof EditedDishRecipe)[] = props.isEditMode
-        ? ["dishId", "stepNumber", "description"]
-        : ["stepNumber", "description"];
 
+      //手順：編集中かどうかでチェック内容を変える
+      const dishRecipeKeys: (keyof EditedDishRecipe)[] = props.isEditMode
+        ? ["dishId", "stepNumber"]
+        : ["stepNumber"];
+
+      //料理：numberなら0（およびnull&undefined）、それ以外は空欄（およびnull&undefined）では送信させない
       const hasDishKeys = dishKeys.every((key) => {
         const value = editedDish[key];
         if (typeof value === "number") {
@@ -137,6 +145,7 @@ const DishForm = (props: Props) => {
         }
       });
 
+      //材料：id以外のnumberなら0（およびnull&undefined）、それ以外は空欄（およびnull&undefined）では送信させない
       const hasDishIngredientKeys =
         editedDishIngredients.length !== 0 &&
         editedDishIngredients.every((ingredient) =>
@@ -152,8 +161,18 @@ const DishForm = (props: Props) => {
               return value !== "" && value !== undefined && value !== null;
             }
           })
+        ) &&
+        //少なくともひとつのdishIdとquantityは入力されていること
+        editedDishIngredients.some(
+          (ingredient) =>
+            ingredient.ingredientId !== undefined &&
+            ingredient.ingredientId !== null &&
+            ingredient.quantity !== "" &&
+            ingredient.quantity !== undefined &&
+            ingredient.quantity !== null
         );
 
+      //手順：id以外のnumberなら0（およびnull&undefined）、それ以外は空欄（およびnull&undefined）では送信させない
       const hasDishRecipeKeys =
         editedDishRecipes.length !== 0 &&
         editedDishRecipes.every((recipe) =>
@@ -165,6 +184,13 @@ const DishForm = (props: Props) => {
               return value !== "" && value !== undefined && value !== null;
             }
           })
+        ) &&
+        //少なくともひとつのdescriptionは入力されていること
+        editedDishRecipes.some(
+          (ingredient) =>
+            ingredient.description !== "" &&
+            ingredient.description !== undefined &&
+            ingredient.description !== null
         );
 
       return !hasDishKeys || !hasDishIngredientKeys || !hasDishRecipeKeys;
@@ -184,6 +210,7 @@ const DishForm = (props: Props) => {
     )
       return;
 
+    //料理
     const newDish = {
       name: editedDish.name,
       timeMinutes: editedDish.timeMinutes,
@@ -192,19 +219,22 @@ const DishForm = (props: Props) => {
       imageUrl: editedDish.imageUrl,
     };
 
+    //材料
     const newDishIngredients = editedDishIngredients
+      //材料と量が入力されていないものは省く
       .filter(
         (ingredient) =>
-          ingredient.ingredientId !== undefined &&
-          ingredient.quantity !== undefined
+          ingredient.ingredientId !== undefined && ingredient.quantity
       )
       .map((ingredient) => ({
         ingredientId: ingredient.ingredientId,
         quantity: ingredient.quantity,
       }));
 
+    //手順
     const newDishRecipes = editedDishRecipes
-      .filter((recipe) => recipe.description !== undefined)
+      //詳細が入力されていないものは省く
+      .filter((recipe) => recipe.description)
       .map((recipe) => ({
         stepNumber: recipe.stepNumber,
         description: recipe.description,
@@ -224,7 +254,6 @@ const DishForm = (props: Props) => {
       });
 
       const result = await res.json();
-      
 
       if (!res.ok) {
         throw new Error(result.error || "登録に失敗しました。");
@@ -251,6 +280,7 @@ const DishForm = (props: Props) => {
     )
       return;
 
+    //料理
     const newDish = {
       name: editedDish.name,
       timeMinutes: editedDish.timeMinutes,
@@ -259,11 +289,12 @@ const DishForm = (props: Props) => {
       imageUrl: editedDish.imageUrl,
     };
 
+    //材料
     const newDishIngredients = editedDishIngredients
+      //材料と量が入力されていないものは省く
       .filter(
         (ingredient) =>
-          ingredient.ingredientId !== undefined &&
-          ingredient.quantity !== undefined
+          ingredient.ingredientId !== undefined && ingredient.quantity
       )
       .map((ingredient) => ({
         dishId: ingredient.dishId,
@@ -271,7 +302,9 @@ const DishForm = (props: Props) => {
         quantity: ingredient.quantity,
       }));
 
+    //手順
     const newDishRecipes = editedDishRecipes
+      //詳細が入力されていないものは省く
       .filter((recipe) => recipe.description !== undefined)
       .map((recipe) => ({
         dishId: recipe.dishId,
@@ -513,8 +546,11 @@ const DishForm = (props: Props) => {
           }}
         />
       </div>
-      <h3 className="text-xl font-bold text-center bg-primary py-1 mb-3 mt-10">
-        手順
+      <h3 className="flex justify-center items-center text-xl font-bold  bg-primary py-1 mb-8">
+        <span className="mr-3">手順</span>
+        <span className="bg-attention text-sm text-white px-1 py-1 rounded">
+          必須
+        </span>
       </h3>
       <ul>
         {editedDishRecipes.map((edr, index) => (
