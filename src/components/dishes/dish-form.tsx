@@ -513,8 +513,11 @@ const DishForm = (props: Props) => {
           }}
         />
       </div>
-      <h3 className="text-xl font-bold text-center bg-primary py-1 mb-3 mt-10">
-        手順
+      <h3 className="flex justify-center items-center text-xl font-bold  bg-primary py-1 mb-8">
+        <span className="mr-3">手順</span>
+        <span className="bg-attention text-sm text-white px-1 py-1 rounded">
+          必須
+        </span>
       </h3>
       <ul>
         {editedDishRecipes.map((edr, index) => (
