@@ -56,7 +56,7 @@ const IngredientsPage = () => {
           <li
             key={ingredient.id}
             className={clsx(
-              "flex items-center justify-between relative h-15 mb-3 p-3 shadow-md rounded",
+              "flex items-center justify-between relative h-15 mb-3 p-3 bg-white shadow-md rounded",
               {
                 "outline-primary outline-3": isClicked,
                 "outline-border outline-1": !isClicked,
