@@ -5,13 +5,48 @@
 食材の在庫管理とオリジナルレシピの登録ができる Web アプリケーションです。
 在庫情報をもとに、献立を考えることができます。
 
+- 作りたい料理があるときに、足りない食材をすぐに把握したい
+- 今ある食材をもとに、簡単に献立を立てたい
+
+といった目的で制作を始めました。
+
+<br>
+
+現在は開発途中で、
+
+- レシピの登録  
+- 材料の登録  
+
+といった基本機能のみ実装済みです。
+
+## デモムービー
+
+- 材料の新規登録
+  - https://github.com/user-attachments/assets/b2842b0d-466f-4948-afb1-51655faa1409
+
+- 材料の編集・削除
+  - https://github.com/user-attachments/assets/34304d74-5744-4d8b-9597-6a058f302eff
+
+- 料理の新規登録
+  - https://github.com/user-attachments/assets/2d848578-2c96-46f6-b1bc-56a8868c69fc
+
+- 料理の編集
+  - https://github.com/user-attachments/assets/9067f815-1988-4da6-9423-663e95807929
+
+- 料理の削除
+  - https://github.com/user-attachments/assets/af036e31-adda-487b-a04f-e1b2d478993a
+
+<br>
+
 ## 技術スタック
 
-- **フロントエンド**: Next.js 15 (App Router), React, TypeScript, Tailwind CSS, clsx, SWR
-- **UI ライブラリ**: Radix UI
-- **バリデーション**: Zod
-- **バックエンド**: API Routes (Next.js), Node.js
-- **データベース**: MySQL (Docker), Drizzle ORM
+- **フロントエンド**: `Next.js 15 (App Router)`, `React`, `TypeScript`, `Tailwind CSS`, `clsx`, `SWR`
+- **UI ライブラリ**: `Radix UI`, `lucide-react`
+- **バリデーション**: `Zod`
+- **バックエンド**: `API Routes (Next.js)`, `Node.js`
+- **データベース**: `MySQL (Docker)`, `Drizzle ORM`
+
+<br>
 
 ## 実装済みの機能と未実装の機能
 
@@ -67,14 +102,14 @@
   - 料理登録時に必要な材料情報は、[材料ページ](#材料ページingredients)であらかじめ登録されたデータをもとに取得します。
   - `SWR` を使って API から材料データを取得し、それを `map()` で整形して `select` 要素の `option` に渡しています。
   - 登録された料理材料は、`dish_ingredients` テーブルで管理されます。
-  - 処理は料理と同じ API エンドポイントで行われます。
+  - 処理は 料理 と同じ API エンドポイントで行われます。
   - API 側では `Zod` を用いてデータのバリデーションを実施し、`Drizzle ORM` を使って `MySQL` の `dishes` テーブルに `insert`（編集時は `delete` および `insert`）しています。
   - データの不整合を防ぐため、`dishes` / `dish_ingredients` / `dish_recipes` の 3 テーブルを `transaction` によって同時に処理しています。
 
 - **料理の入力項目：手順**
 
   - 登録された料理手順は、`dish_recipes` テーブルで管理されます。
-  - 処理は料理と同じ API エンドポイントで行われます。
+  - 処理は 料理 と同じ API エンドポイントで行われます。
   - API 側では `Zod` を用いてデータのバリデーションを実施し、`Drizzle ORM` を使って `MySQL` の `dish_recipes` テーブルに `insert`（編集時は `delete` および `insert`）しています。
   - データの不整合を防ぐため、`dishes` / `dish_ingredients` / `dish_recipes` の 3 テーブルを `transaction` によって同時に処理しています。
 
@@ -149,11 +184,16 @@
 - アプリのデプロイ
 - 本番環境での動作確認
 
+<br>
+
 ## 相談・協力を得た箇所
 
 ### 有識者に相談・協力を得た箇所
 
 #### 技術設計
+- **設計に関するフィードバック**
+  - 機能を実装する際、使用するHooksやテーブルのカラム設計など、設計の妥当性について意見をもらうことがありました。
+
 
 - **使用ライブラリの提案・確認**
   - 実装内容をレビューしてもらった際、ライブラリの使用が推奨される箇所について指摘を受けました（例：`clsx`、`SWR`）。
@@ -163,7 +203,7 @@
 
 - **知識面でのサポート**
   - Next.js の開発経験がなかったため、ページ遷移や API ルート機能の実装方法について助言をもらいました。
-- React の Hooks や TypeScript の型定義について、理解が不十分だった点を中心に説明を受けました。
+  - React の Hooks や TypeScript の型定義について、理解が不十分だった点を中心に説明を受けました。
 
 - **エラー発生時の調査**
 
@@ -178,9 +218,17 @@
     - コンポーネントにおける `variant` の活用
     - `onChange` イベントの型定義
 
+<br>
+
 ### AI を活用した箇所
 
 #### 技術設計
+
+- **セレクトボックスの実装**
+  - `select` コンポーネントに検索ボックスを設ける UI 案を提案してもらいました。
+
+- **コンポーネントにおけるvariantの活用**
+  - `variant`を活用したコンポーネントの作成（スタイルの適用）について、コードを提案してもらいました。
 
 - **モーダル機能の実装**
   - `context` を利用した効率的なモーダルの実装方法に悩んだため、AI に相談し、モーダルの制御を Hooks で行う設計を提案してもらいました。
@@ -198,10 +246,8 @@
 
   - ライブラリごとの用途や構文について、目的に応じた実装例を交えて説明を受けました。
 
-- **UI の提案**
-
-  - `select` コンポーネントに検索ボックスを設ける UI 改善案を提案してもらいました。
-  - `Tailwind CSS` による視覚的な調整方法（幅・padding・レスポンシブ対応など）についてもアドバイスを受けました。
+- **スタイルの実装**
+  - `Tailwind CSS` による視覚的な実装についてアドバイスを受けました。
 
 - **命名補助**
 
@@ -214,14 +260,16 @@
 - **seed データの作成**
   - テーブル構成に基づいて、開発用の仮データ（seed）を適切な形式で作成してもらいました。
 
+<br>
+
 ## 開発中に発生した主なエラーと対処法
 
-### `Radix UI`の`<Select>`について
+### `Radix UI` の `<Select>` について
 
-`Radix UI` の `<Select>` を使用し、`value` を `props` で制御していたにもかかわらず、`value` が空文字のまま変更されないという事象が発生しました。
+`Radix UI` の `<Select>` を使用し、`value` を `props` で制御していたにもかかわらず、セレクトボックスの初期値が変更されないという事象が発生しました。
 
 ```ts
-//エラー時のコード
+//select-box.tsx
 <Select.Root
   value={value}
   onValueChange={(val) => {
@@ -233,28 +281,51 @@
 **原因の調査**
 
 `console.log` で挙動を調べたところ、
-レンダリング時に `props` の値が渡され`value`はいちど変更されるのですが、 その直後に`onValueChange` が呼ばれ、それによって `value` が空文字にされていることが確認できました。
+レンダリング時に `props` の値が渡されて `value` は一度変更されるものの、その直後に`onValueChange` が発火し、それによって `value` が空文字（`""`）に戻されてしまう挙動を確認しました。
 
 同様の現象は Radix UI の GitHub Issue にも報告されており、
-`<Select>` をフォーム内で使用した際、`value` を変更した直後に `onValueChange` が空文字で発火する問題として共有されていました。
+`<Select>` をフォーム内で使用した際、`value` を変更した直後に `onValueChange` が空文字（`""`）で発火する問題として共有されています。
 
 🔗 https://github.com/radix-ui/primitives/issues/3135
 
 **解決方法**
 
-この問題については、渡された値が空文字かどうかを判定して処理をスキップすることで回避できるとされています。
+この問題については、渡された値が空文字かどうかを判定して処理をスキップすることで回避できるとされています。<br>
 完全な根本解決ではないようですが、今回はその方法を採用し、以下のようにして対応しました。
 
 ```ts
+//select-box.tsx
 <Select.Root
   value={value}
   onValueChange={(val) => {
-    if (val === "") return;
+    if (val === "") return; //追加
     onChange(Number(val));
   }}
 >
 //...省略...
 ```
+
+<br>
+
+---
+
+### モーダル の `<dialog>` について
+
+当初、モーダルを `<dialog>` タグで実装していましたが、
+モーダル上で `Radix UI` の `<Select>` を使用した際に、セレクトの選択肢が表示されない問題が発生しました。
+
+**原因の調査**
+
+`Radix UI`のセレクト選択肢`<Select.Content>`は`position: fixed`で表示されますが、`<Select.Content>`の`z-index`にかかわらず
+`<dialog>` タグは常に最前面に表示されるため、`z-index` の影響を受けず、
+実際にはセレクトが背後に隠れている状態となっていました。
+
+
+**解決方法**
+`Radix UI` の `<Dialog>` は `<div role="dialog">` として表示されるため、
+モーダルの表示にも `Radix UI` の `<Dialog>` を使用することで、正常にセレクトの選択肢が表示されるようになり、問題は解決しました。
+
+<br>
 
 ---
 
@@ -289,6 +360,8 @@ Fallback data is required when using Suspense in SSR.
 >「（Next.js のプリレンダリングを含む）サーバーサイドで Suspense モードを使用する場合、fallbackData を介してデータを提供する必要がある。つまり、サスペンスを使用してサーバーサイドでデータを取得することはできず、クライアントサイドで完全にデータを取得する必要がある。」
 
 🔗 https://swr.vercel.app/docs/suspense
+
+`suspense: true` を指定している場合、`SSR`と同時に使用することはできないという仕様により、エラーが発生していました。
 
 **解決方法**
 
@@ -337,20 +410,20 @@ export default function RootLayout({
 }
 ```
 
-
+<br>
 
 ---
 
 ### エンドポイントの `params` の扱いについて
 
 ```ts
-//エラー時のコード
+//route.ts
 export const PUT = async (
   req: Request,
   { params }: { params: {id: string } }
 ) => {
   try {
-    const id = Number(params.id); //エラー発生
+    const id = Number(params.id); 
 
 //...省略...
 ```
@@ -362,28 +435,24 @@ HTTP リクエストを送信する際、以下のエラーが発生していま
 ```
 **原因の調査**
 
-公式ドキュメントを確認したところ、Next.js の App Router においては params が 非同期で解決される仕様であるにもかかわらず、同期的に扱おうとしたためにエラーが発生していたことがわかりました。
-
-これは、私自身の「同期処理と非同期処理」の理解が浅かったことに起因していました。
+公式ドキュメントを確認したところ、Next.js の App Router においては `params` が 非同期で解決される仕様であるにもかかわらず、同期的に扱おうとしたためにエラーが発生していたことがわかりました。
 
 **解決方法**
 
-params を Promise<{ id: string }> として受け取り、await してからアクセスするように修正することで解決しました。
+`params` を `Promise<{ id: string }>` として受け取り、`await` してからアクセスするように修正することで解決しました。
 
 ```ts
 export const PUT = async (
   req: Request,
-  { params }: { params: Promise<{id: string }> }
+  { params }: { params: Promise<{id: string }> } //修正
 ) => {
   try {
-    const id = Number((await params).id);
+    const id = Number((await params).id); //修正
 
 //...省略...
 ```
 
----
-
-### Radix UI の
+<br>
 
 ## テーブル構成
 
