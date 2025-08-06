@@ -49,7 +49,3 @@ body {
   box-sizing: content-box;
   overflow-y: scroll;
 }
-
-dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.5); 
-}
