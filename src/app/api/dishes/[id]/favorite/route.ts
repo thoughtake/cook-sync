@@ -1,0 +1,48 @@
+import { db } from "@/db";
+import { dishes } from "@/db/schema";
+import { DishSchema } from "@/schemas/dish-schema";
+import { IdSchema } from "@/schemas/id-shema";
+import { eq } from "drizzle-orm";
+
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const idResult = IdSchema.safeParse((await params).id);
+    if (!idResult.success) {
+      return Response.json(
+        { error: "Invalid id", details: idResult.error },
+        { status: 400 }
+      );
+    }
+    const id = Number(idResult.data);
+
+    const body = await req.json();
+    const result = DishSchema.safeParse(body);
+    if (!result.success) {
+      return Response.json(
+        { error: "Invalid data", details: result.error, id },
+        { status: 400 }
+      );
+    }
+
+    const { name, timeMinutes, servings, isFavorite, imageUrl } = result.data;
+
+    await db
+      .update(dishes)
+      .set({
+        name,
+        timeMinutes,
+        servings,
+        isFavorite,
+        imageUrl,
+      })
+      .where(eq(dishes.id, id));
+
+    return Response.json({ success: true, editedId: id });
+  } catch (error) {
+    console.error("POST /api/dishes/[id]/favorite error:", error);
+    return Response.json({ error: "更新に失敗しました" }, { status: 500 });
+  }
+}

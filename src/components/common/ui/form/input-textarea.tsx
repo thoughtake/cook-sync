@@ -6,27 +6,27 @@ type Props = {
   label: string;
   value: string;
   isRequired: boolean;
-  onChange: ComponentProps<"input">["onChange"];
-  suffix?: string;
+  onChange: ComponentProps<"textarea">["onChange"];
   className?: string;
   showLabel?: boolean;
+  hasMargin?: boolean;
 };
 
-const InputText = (props: Props) => {
+const InputTextarea = (props: Props) => {
   const {
     name,
     label,
     value,
     isRequired,
     onChange,
-    suffix,
     className = "w-full",
     showLabel = true,
+    hasMargin = true
   } = props;
 
 
   return (
-    <div className="mb-7">
+    <div className={`${hasMargin ? "mb-7" : "mb-0"}`}>
       {showLabel && (
         <div className="font-bold mb-2">
           <label htmlFor={name} className="mr-2">
@@ -39,18 +39,16 @@ const InputText = (props: Props) => {
           )}
         </div>
       )}
-      <input
+      <textarea
         id={name}
-        type="text"
         name={name}
         value={value}
         required={isRequired}
         onChange={onChange}
         className={clsx(className, "border-border border-3 rounded p-3")}
       />
-      {suffix && <span className="font-bold ml-3">{suffix}</span>}
     </div>
   );
 };
 
-export default memo(InputText);
+export default memo(InputTextarea);

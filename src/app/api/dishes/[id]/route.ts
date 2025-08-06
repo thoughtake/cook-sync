@@ -1,0 +1,90 @@
+import { db } from "@/db";
+import { dishes, dishIngredients, dishRecipes } from "@/db/schema";
+import { DishSchema } from "@/schemas/dish-schema";
+import { eq } from "drizzle-orm";
+import { deleteHandler } from "../../delete-handler";
+import z from "zod";
+import { DishIngredientUpdateSchema } from "@/schemas/dish-ingredient-schema";
+import { DishRecipeUpdateSchema } from "@/schemas/dish-recipe-schema";
+import { IdSchema } from "@/schemas/id-shema";
+
+export const DELETE = async (
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) => {
+    const idResult = IdSchema.safeParse((await params).id);
+    if (!idResult.success) {
+      return Response.json(
+        { error: "Invalid id", details: idResult.error },
+        { status: 400 }
+      );
+    }
+    const id = idResult.data;
+
+  return await deleteHandler({
+    table: dishes,
+    column: dishes.id,
+    id: id,
+  });
+};
+
+export const PUT = async (
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) => {
+  try {
+    const idResult = IdSchema.safeParse((await params).id);
+    if (!idResult.success) {
+      return Response.json(
+        { error: "Invalid id", details: idResult.error },
+        { status: 400 }
+      );
+    }
+    const dishId = Number(idResult.data);
+    
+    const { dish, ingredients, recipes } = await req.json();
+    const parsedDish = DishSchema.safeParse(dish);
+    const parsedDishIngredients = z
+    .array(DishIngredientUpdateSchema)
+    .safeParse(ingredients);
+    const parsedDishRecipes = z.array(DishRecipeUpdateSchema).safeParse(recipes);
+    
+    if (!parsedDish.success || !parsedDishIngredients.success || !parsedDishRecipes.success) {
+      return Response.json(
+        {
+          error: "Invalid data",
+          details: {
+            dish: !parsedDish.success ? parsedDish.error : null,
+            dishIngredients: !parsedDishIngredients.success
+            ? parsedDishIngredients.error
+            : null,
+            dishRecipes: !parsedDishRecipes.success
+            ? parsedDishRecipes.error
+            : null,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    await db.transaction(async (tx) => {
+      //料理の更新
+      await tx.update(dishes).set(parsedDish.data).where(eq(dishes.id, dishId));
+
+      //材料の更新
+      await tx
+        .delete(dishIngredients)
+        .where(eq(dishIngredients.dishId, dishId));
+      await tx.insert(dishIngredients).values(parsedDishIngredients.data);
+
+      //手順の更新
+      await tx.delete(dishRecipes).where(eq(dishRecipes.dishId, dishId));
+      await tx.insert(dishRecipes).values(parsedDishRecipes.data);
+    });
+
+    return Response.json({ success: true, editedId: dishId });
+  } catch (error) {
+    console.error("POST /api/dishes/[id] error:", error);
+    return Response.json({ error: "更新に失敗しました" }, { status: 500 });
+  }
+};

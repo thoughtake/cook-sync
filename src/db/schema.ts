@@ -1,26 +1,79 @@
-import { mysqlTable, serial, int, varchar,} from 'drizzle-orm/mysql-core';
+import {
+  mysqlTable,
+  int,
+  varchar,
+  boolean,
+  decimal,
+  foreignKey,
+} from "drizzle-orm/mysql-core";
 
-export const ingredients = mysqlTable('ingredients', {
-  id: serial('id').primaryKey(), 
-  name: varchar('name', { length: 255 }).notNull(),
-  ingredientGroupId: int('ingredient_group_id').notNull(),
-  unitId: int('unit_id').notNull(),
-  pricePerUnit: int('price_per_unit'), 
+//材料
+export const ingredients = mysqlTable("ingredients", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  ingredientGroupId: int("ingredient_group_id")
+    .notNull()
+    .references(() => ingredientGroups.id),
+  unitId: int("unit_id")
+    .notNull()
+    .references(() => units.id),
+  pricePerUnit: int("price_per_unit").notNull(),
 });
 
-export const units = mysqlTable('units', {
-  id: serial('id').primaryKey(), 
-  name: varchar('name', { length: 255 }).notNull(),
-  amountPerUnit: int('amount_per_unit'),
+export const units = mysqlTable("units", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  amountPerUnit: int("amount_per_unit").notNull(),
 });
 
-export const ingredientGroups = mysqlTable('ingredient_groups', {
-  id: serial('id').primaryKey(), 
-  name: varchar('name', { length: 255 }).notNull(),
+export const ingredientGroups = mysqlTable("ingredient_groups", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
 });
 
-export const ingredientGroupColors = mysqlTable('ingredient_group_colors', {
-  id: serial('id').primaryKey(),
-  ingredientGroupId: int('ingredient_group_id').notNull(),
-  colorCode: varchar('color_code', { length: 7 }).notNull(), 
+export const ingredientGroupColors = mysqlTable(
+  "ingredient_group_colors",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    ingredientGroupId: int("ingredient_group_id").notNull(),
+    bgColorCode: varchar("bg_color_code", { length: 7 }).notNull(),
+    textColorCode: varchar("text_color_code", { length: 7 }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.ingredientGroupId],
+      foreignColumns: [ingredientGroups.id],
+      name: "fk_group_color_to_group",
+    }),
+  ]
+);
+
+//料理
+export const dishes = mysqlTable("dishes", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  timeMinutes: int("time_minutes").notNull(),
+  servings: int("servings").notNull(),
+  isFavorite: boolean("is_favorite").default(false).notNull(),
+  imageUrl: varchar("image_url", { length: 1000 }),
+});
+
+export const dishIngredients = mysqlTable("dish_ingredients", {
+  id: int("id").autoincrement().primaryKey(),
+  dishId: int("dish_id")
+    .notNull()
+    .references(() => dishes.id, { onDelete: "cascade" }),
+  ingredientId: int("ingredient_id")
+    .notNull()
+    .references(() => ingredients.id),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull(),
+});
+
+export const dishRecipes = mysqlTable("dish_recipes", {
+  id: int("id").autoincrement().primaryKey(),
+  dishId: int("dish_id")
+    .notNull()
+    .references(() => dishes.id, { onDelete: "cascade" }),
+  stepNumber: int("step_number").notNull(),
+  description: varchar("description", { length: 1000 }).notNull(),
 });

@@ -7,13 +7,13 @@ type Props = {
 };
 
 const ModalConfirm = (props: Props) => {
-  const { closeModal } = useModal();
+  const { closeModal, closeModalAll } = useModal();
 
   const { message, onConfirm } = props;
 
   const handleConfirm = () => {
     onConfirm();
-    closeModal();
+    closeModalAll();
   };
 
   return (

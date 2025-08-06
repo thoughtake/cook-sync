@@ -1,12 +1,15 @@
+"use client";
+
 import { Unit } from "@/types/index";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InputText from "../common/ui/form/input-text";
-import SelectBox from "../common/ui/form/select-box";
 import StandardButton from "../common/ui/button/standard-button";
 import { useModal } from "../../context/modal-context";
-import useIngredients from "@/hooks/useIngredients";
-import useIngredientGroups from "@/hooks/useIngredientGroups";
-import useUnits from "@/hooks/useUnits";
+import useIngredients from "@/hooks/use-ingredients";
+import useIngredientGroups from "@/hooks/use-ingredient-groups";
+import useUnits from "@/hooks/use-units";
+import SelectBox from "../common/ui/form/select-box";
+import { fetchJson } from "@/libs/api/fetch-json";
 
 type Props = {
   targetId: number | null;
@@ -48,6 +51,16 @@ const IngredientsForm = (props: Props) => {
   //モーダルcontext使用
   const { closeModal } = useModal();
 
+  //targetIdの有無で、編集中かどうかを判断する
+  const isEditMode = targetId !== null;
+
+  //対象の食材を取得
+  const editTarget = useMemo(() => {
+    if (isEditMode && ingredients.length > 0) {
+      return ingredients.find((i) => i.id === targetId);
+    }
+  }, [isEditMode, targetId, ingredients]);
+
   // フォームを送れる状態かどうか
   const isDisabled: boolean = useMemo(() => {
     return (
@@ -64,7 +77,7 @@ const IngredientsForm = (props: Props) => {
 
   //セレクトされている単位情報を取得
   const selectedUnit: Unit | undefined = useMemo(() => {
-    return units.find((unit) => unit.id === selectedUnitId);
+    return units.find((unit) => unit.id === Number(selectedUnitId));
   }, [units, selectedUnitId]);
 
   //単位の文言を変更する際に使用
@@ -80,39 +93,36 @@ const IngredientsForm = (props: Props) => {
     setInputPrice(null);
   }, [setInputName, setSelectedUnitId, setSelectedGroupId, setInputPrice]);
 
-  //フォームの送信（保存）
-  const handleSubmitSave = async () => {
+  // 編集時にフォームに編集対象の情報を初期値としてセット
+  useEffect(() => {
+    if (editTarget) {
+      setInputName(editTarget.name);
+      setSelectedGroupId(editTarget.ingredientGroupId);
+      setSelectedUnitId(editTarget.unitId);
+      setInputPrice(editTarget.pricePerUnit ?? null);
+    }
+  }, [editTarget]);
+
+  //フォームの送信（新規登録）
+  const handleSubmitCreate = async () => {
     //編集モードでないこと
-    if (
-      selectedUnitId === null ||
-      selectedGroupId === null ||
-      targetId !== null
-    )
+    if (selectedUnitId === null || selectedGroupId === null || isEditMode)
       return;
 
     // 新しい材料を作成
     const newIngredient = {
-      // id: nextId.current,
       name: inputName,
-      ingredientGroupId: selectedGroupId,
-      unitId: selectedUnitId,
+      ingredientGroupId: Number(selectedGroupId),
+      unitId: Number(selectedUnitId),
       pricePerUnit: inputPrice,
     };
 
     try {
-      const res = await fetch("/api/ingredients", {
+      await fetchJson({
+        url: "/api/ingredients",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(newIngredient),
       });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "登録に失敗しました。");
-      }
 
       //取得
       await mutateIngredients();
@@ -137,10 +147,9 @@ const IngredientsForm = (props: Props) => {
 
     // 新しい材料を作成
     const newIngredient = {
-      // id: targetId,
       name: inputName,
-      ingredientGroupId: selectedGroupId,
-      unitId: selectedUnitId,
+      ingredientGroupId: Number(selectedGroupId),
+      unitId: Number(selectedUnitId),
       pricePerUnit: inputPrice,
     };
 
@@ -175,37 +184,21 @@ const IngredientsForm = (props: Props) => {
     resetForm();
   };
 
-  //編集時にフォームに編集対象の情報を初期値としてセット
-  useEffect(() => {
-    if (targetId !== null) {
-      const editTarget = ingredients.find((i) => i.id === targetId);
-      if (editTarget) {
-        setInputName(editTarget.name);
-        setSelectedGroupId(editTarget.ingredientGroupId);
-        setSelectedUnitId(editTarget.unitId);
-        setInputPrice(editTarget.pricePerUnit ?? null);
-      }
-    } else {
-      //フォームの内容をリセット
-      resetForm();
-    }
-  }, [targetId, ingredients, resetForm]);
-
   return (
     // フォーム
     <>
       <h2 className="text-center text-xl font-bold">{`材料を${
-        targetId !== null ? "編集" : "登録"
+        isEditMode ? "編集" : "登録"
       }`}</h2>
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
           //編集IDがあるかどうかで処理をかえる
-          if (targetId !== null) {
+          if (isEditMode) {
             handleSubmitEdit();
           } else {
-            handleSubmitSave();
+            handleSubmitCreate();
           }
         }}
         className="mb-5"
@@ -213,37 +206,43 @@ const IngredientsForm = (props: Props) => {
         {/* [input]材料名 */}
         <InputText
           name="ingredient"
-          label="食材名"
+          label="材料名"
           value={inputName}
           isRequired={true}
           onChange={(e) => setInputName(e.target.value)}
         />
+
+        {/* [select]分類 */}
         <SelectBox
           name="group"
           label="分類"
-          value={selectedGroupId ?? ""}
+          value={selectedGroupId ? String(selectedGroupId) : ""}
           isRequired={true}
-          onChange={(e) =>
-            handleSelectGroupId(e.target.value ? Number(e.target.value) : null)
-          }
+          onChange={(value) => {
+            handleSelectGroupId(value ? Number(value) : null);
+          }}
           options={ingredientGroups}
         />
+
+        {/* [select]単位 */}
         <SelectBox
           name="unit"
           label="単位"
-          value={selectedUnitId ?? ""}
+          value={selectedUnitId ? String(selectedUnitId) : ""}
           isRequired={true}
-          onChange={(e) =>
-            handleSelectUnitId(e.target.value ? Number(e.target.value) : null)
-          }
+          onChange={(value) => {
+            handleSelectUnitId(value ? Number(value) : null);
+          }}
           options={units}
         />
 
+        {/* [input]相場 */}
+        {/* 単位が選ばれたら表示する */}
         <div className={`${selectedUnitId === null ? "invisible" : "visible"}`}>
           <InputText
             name="相場"
             label={`${unitLabel}あたりの相場`}
-            value={inputPrice ?? ""}
+            value={inputPrice ? String(inputPrice) : ""}
             isRequired={true}
             onChange={(e) => {
               const value = e.target.value;
@@ -263,7 +262,7 @@ const IngredientsForm = (props: Props) => {
 
         {/* 送信ボタン */}
         <div>
-          {targetId !== null ? (
+          {isEditMode ? (
             <div className="flex gap-4">
               <StandardButton
                 label="編集"

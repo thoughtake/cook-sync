@@ -1,8 +1,11 @@
 import clsx from "clsx";
+import { LucideIcon } from "lucide-react";
 
 type Props = {
   label: string;
+  icon?: LucideIcon;
   variant?: "filled" | "outline";
+  size? : "sm" | "md"
   radius?: "rounded" | "circle";
   color?: "primary" | "black" | "green" | "gray" | "red";
   isDisabled?: boolean;
@@ -13,7 +16,9 @@ type Props = {
 const StandardButton = (props: Props) => {
   const {
     label,
+    icon : Icon,
     variant = "filled",
+    size = "md",
     radius = "rounded",
     color = "primary",
     isDisabled = false,
@@ -21,10 +26,15 @@ const StandardButton = (props: Props) => {
     onClick,
   } = props;
 
+  const sizeMap = {
+    sm: {size: "px-3 py-2 font-normal", border: "border", icon: "w-5 h-5"},
+    md: {size: "px-4 py-2 text-xl font-bold", border: "border-2", icon: "w-8 h-8"}
+  }
+
   const radiusMap = {
     rounded: "rounded",
-    circle: "rounded-full",
-  };
+    circle: "rounded-full"
+  }
 
   const colorMap = {
     primary: {
@@ -57,9 +67,11 @@ const StandardButton = (props: Props) => {
   const { bg, border, text: textMap } = colorMap[color];
   const text = textMap[variant];
 
+  const {size: buttonSize, border: borderWidth, icon: iconSize} = sizeMap[size];
+
   const variantMap = {
-    filled: `${bg} border-none ${text}`,
-    outline: `bg-transparent border border-2 ${border} ${text}`,
+    filled: `${bg} border-none ${text} ${buttonSize}`,
+    outline: `bg-transparent border ${border} ${text} ${buttonSize} ${borderWidth}`,
   };
 
   return (
@@ -71,11 +83,17 @@ const StandardButton = (props: Props) => {
         variantMap[variant],
         radiusMap[radius],
         className,
-        "my-3 px-4 py-2 text-xl font-bold rounded",
+        "flex items-center justify-center",
+        "my-3 rounded",
         "cursor-pointer hover:brightness-110",
         "disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-default disabled:brightness-100"
       )}
     >
+      {Icon 
+      && (
+        <Icon className={`${iconSize} mr-1`}/>
+      )
+    }
       {label}
     </button>
   );

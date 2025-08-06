@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { ingredients } from "@/db/schema";
 import { IngredientSchema } from "@/schemas/ingredient-schema";
 
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   try {
     const body = await req.json();
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export const GET = async () => {
   try {
     const result = await db.select().from(ingredients);
 

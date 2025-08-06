@@ -1,4 +1,4 @@
-const IngredientsLoading = () => {
+const DishesLoading = () => {
   return (
     <div className="flex justify-center items-center text-center h-screen">
       <p>ロード中...</p>
@@ -6,4 +6,4 @@ const IngredientsLoading = () => {
   );
 };
 
-export default IngredientsLoading;
+export default DishesLoading;
