@@ -1,4 +1,4 @@
-import { initDb } from "@/db/initDb";
+import { initDb } from "@/db/init-db";
 import {
   units,
   ingredientGroups,

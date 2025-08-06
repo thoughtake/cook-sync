@@ -10,7 +10,7 @@ import useIngredients from "@/hooks/use-ingredients";
 import useIngredientGroups from "@/hooks/use-ingredient-groups";
 import useUnits from "@/hooks/use-units";
 import useIngredientGroupColors from "@/hooks/use-ingredient-group-colors";
-import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
+import { useDeleteItemWithConfirm } from "@/libs/api/delete-item";
 
 const IngredientsPage = () => {
   const { ingredients, mutateIngredients } = useIngredients();
@@ -37,7 +37,7 @@ const IngredientsPage = () => {
 
   //削除確認
   const handleDeleteConfirm = ({ id, name }: { id: number; name: string }) => {
-    deleteConfirm({id, name});
+    deleteConfirm({ id, name });
   };
 
   return (

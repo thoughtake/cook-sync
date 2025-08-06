@@ -9,7 +9,7 @@ import useIngredients from "@/hooks/use-ingredients";
 import useIngredientGroups from "@/hooks/use-ingredient-groups";
 import useUnits from "@/hooks/use-units";
 import SelectBox from "../common/ui/form/select-box";
-import { fetchJson } from "@/libs/api/fetchJson";
+import { fetchJson } from "@/libs/api/fetch-json";
 
 type Props = {
   targetId: number | null;

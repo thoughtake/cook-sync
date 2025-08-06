@@ -1,7 +1,7 @@
 import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
 import { useModal } from "@/context/modal-context";
 import { KeyedMutator } from "swr";
-import { fetchJson } from "./fetchJson";
+import { fetchJson } from "./fetch-json";
 
 export type DeleteItemParams<T> = {
   id: number;
@@ -16,11 +16,10 @@ export const deleteItem = async <T,>({
 }: DeleteItemParams<T>): Promise<void> => {
   if (id) {
     try {
-
       await fetchJson({
         url: `${endpoint}/${id}`,
-        method: "DELETE"
-      })
+        method: "DELETE",
+      });
 
       //GET
       await mutate();
@@ -31,17 +30,20 @@ export const deleteItem = async <T,>({
   }
 };
 
-type DeleteItemWithConfirmParams<T> = Omit<DeleteItemParams<T>, "id">
+type DeleteItemWithConfirmParams<T> = Omit<DeleteItemParams<T>, "id">;
 
 //削除確認
-export const useDeleteItemWithConfirm = <T,> ({ endpoint, mutate }: DeleteItemWithConfirmParams<T>) => {
+export const useDeleteItemWithConfirm = <T,>({
+  endpoint,
+  mutate,
+}: DeleteItemWithConfirmParams<T>) => {
+  const { showModal } = useModal();
 
-  const {showModal} = useModal();
-
-  return ({id, name}: {id: number, name: string})=>  showModal(
+  return ({ id, name }: { id: number; name: string }) =>
+    showModal(
       <ModalConfirm
         message={`${name} を削除してよろしいですか？`}
-        onConfirm={() => deleteItem({id, endpoint, mutate})}
+        onConfirm={() => deleteItem({ id, endpoint, mutate })}
       />
     );
-  };
+};

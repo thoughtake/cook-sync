@@ -15,10 +15,10 @@ import {
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import IconButton from "../common/ui/button/icon-button";
-import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
+import { useDeleteItemWithConfirm } from "@/libs/api/delete-item";
 import DishForm from "./dish-form";
 import { useModal } from "@/context/modal-context";
-import { fetchJson } from "@/libs/api/fetchJson";
+import { fetchJson } from "@/libs/api/fetch-json";
 
 const DishInfo = ({ dishId }: { dishId: number }) => {
   const { dishes, mutateDishes } = useDishes();

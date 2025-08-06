@@ -10,10 +10,10 @@ import InputTextarea from "../common/ui/form/input-textarea";
 import { useModal } from "@/context/modal-context";
 import useIngredients from "@/hooks/use-ingredients";
 import useDishes from "@/hooks/use-dishes";
-import useDishIngredients from "@/hooks/use-dish-Ingredients";
+import useDishIngredients from "@/hooks/use-dish-ingredients";
 import useDishRecipes from "@/hooks/use-dish-recipes";
 import useUnits from "@/hooks/use-units";
-import { fetchJson } from "@/libs/api/fetchJson";
+import { fetchJson } from "@/libs/api/fetch-json";
 
 //料理タイプ（編集用）
 type EditedDish = Pick<Dish, "isFavorite" | "imageUrl"> &
