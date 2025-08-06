@@ -6,12 +6,20 @@ import { deleteHandler } from "../../delete-handler";
 import z from "zod";
 import { DishIngredientUpdateSchema } from "@/schemas/dish-ingredient-schema";
 import { DishRecipeUpdateSchema } from "@/schemas/dish-recipe-schema";
+import { IdSchema } from "@/schemas/id-shema";
 
 export const DELETE = async (
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) => {
-  const id = (await params).id;
+    const idResult = IdSchema.safeParse((await params).id);
+    if (!idResult.success) {
+      return Response.json(
+        { error: "Invalid id", details: idResult.error },
+        { status: 400 }
+      );
+    }
+    const id = idResult.data;
 
   return await deleteHandler({
     table: dishes,
@@ -25,13 +33,14 @@ export const PUT = async (
   { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const dishId = Number((await params).id);
-    if (isNaN(dishId)) {
+    const idResult = IdSchema.safeParse((await params).id);
+    if (!idResult.success) {
       return Response.json(
-        { error: "dishIdが数値ではありません", dishId },
+        { error: "Invalid id", details: idResult.error },
         { status: 400 }
       );
     }
+    const dishId = Number(idResult.data);
     
     const { dish, ingredients, recipes } = await req.json();
     const parsedDish = DishSchema.safeParse(dish);

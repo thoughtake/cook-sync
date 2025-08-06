@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { dishes } from "@/db/schema";
 import { DishSchema } from "@/schemas/dish-schema";
+import { IdSchema } from "@/schemas/id-shema";
 import { eq } from "drizzle-orm";
 
 export async function PUT(
@@ -8,14 +9,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number((await params).id);
-
-    if (isNaN(id)) {
+    const idResult = IdSchema.safeParse((await params).id);
+    if (!idResult.success) {
       return Response.json(
-        { error: "idが数値ではありません", id },
+        { error: "Invalid id", details: idResult.error },
         { status: 400 }
       );
     }
+    const id = Number(idResult.data);
 
     const body = await req.json();
     const result = DishSchema.safeParse(body);

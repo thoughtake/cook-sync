@@ -286,7 +286,7 @@ const DishForm = (props: Props) => {
       timeMinutes: editedDish.timeMinutes,
       servings: editedDish.servings,
       isFavorite: editedDish.isFavorite,
-      imageUrl: editedDish.imageUrl,
+      imageUrl: editedDish.imageUrl ? editedDish.imageUrl : undefined,
     };
 
     //材料
@@ -294,7 +294,7 @@ const DishForm = (props: Props) => {
       //材料と量が入力されていないものは省く
       .filter(
         (ingredient) =>
-          ingredient.ingredientId !== undefined && ingredient.quantity
+          (ingredient.ingredientId !== undefined) && ingredient.quantity
       )
       .map((ingredient) => ({
         dishId: ingredient.dishId,
@@ -312,6 +312,7 @@ const DishForm = (props: Props) => {
         description: recipe.description,
       }));
 
+
     try {
       const res = await fetch(`api/dishes/${props.dishId}`, {
         method: "PUT",
@@ -328,6 +329,7 @@ const DishForm = (props: Props) => {
       const result = await res.json();
 
       if (!res.ok) {
+        console.error("詳細エラー", result.details);
         throw new Error(result.error || "更新に失敗しました。");
       }
 

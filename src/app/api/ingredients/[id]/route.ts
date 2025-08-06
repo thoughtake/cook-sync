@@ -3,32 +3,41 @@ import { ingredients } from "@/db/schema";
 import { IngredientSchema } from "@/schemas/ingredient-schema";
 import { eq } from "drizzle-orm";
 import { deleteHandler } from "../../delete-handler";
+import { IdSchema } from "@/schemas/id-shema";
 
 export const DELETE = async (
   req: Request,
-  {params}: { params: Promise<{id: string}> }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
+  const idResult = IdSchema.safeParse((await params).id);
+  if (!idResult.success) {
+    return Response.json(
+      { error: "Invalid id", details: idResult.error },
+      { status: 400 }
+    );
+  }
+  const id = idResult.data;
 
-  const id = (await params).id;
-  
   return await deleteHandler({
     table: ingredients,
     column: ingredients.id,
-    id: id
-  })
-
-}
+    id: id,
+  });
+};
 
 export const PUT = async (
   req: Request,
-  { params }: { params: Promise< {id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = Number((await params).id);
-
-    if (isNaN(id)) {
-      return Response.json({ error: "idが数値ではありません", id }, { status: 400 });
+    const idResult = IdSchema.safeParse((await params).id);
+    if (!idResult.success) {
+      return Response.json(
+        { error: "Invalid id", details: idResult.error },
+        { status: 400 }
+      );
     }
+    const id = Number(idResult.data);
 
     const body = await req.json();
     const result = IngredientSchema.safeParse(body);
@@ -56,4 +65,4 @@ export const PUT = async (
     console.error("POST /api/ingredients/[id] error:", error);
     return Response.json({ error: "更新に失敗しました" }, { status: 500 });
   }
-}
+};
