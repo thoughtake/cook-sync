@@ -8,6 +8,10 @@ type Props = {
   radius?: "rounded" | "circle";
   color?: "primary" | "black" | "green" | "gray" | "red";
   className?: string;
+  /**
+   * onClickを渡すと、buttonのtypeは"button"になります。
+   * 渡さない場合はtype="submit"になります。
+   */
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
@@ -38,39 +42,39 @@ const IconButton = ({
 
   const radiusMap = {
     rounded: "rounded",
-    circle: "rounded-full"
+    circle: "rounded-full",
   };
 
   const colorMap = {
     primary: {
       bg: "bg-primary",
       border: "border-primary",
-      text: {filled: "text-text", outline: "text-primary"}
+      text: { filled: "text-text", outline: "text-primary" },
     },
     black: {
       bg: "text-text",
       border: "border-text",
-      text: {filled: "text-white", outline: "text-text"},
+      text: { filled: "text-white", outline: "text-text" },
     },
     green: {
       bg: "bg-green-600",
       border: "border-green-600",
-      text: {filled: "text-white", outline: "border-green-600"}
+      text: { filled: "text-white", outline: "border-green-600" },
     },
     gray: {
       bg: "bg-cancel",
       border: "border-cancel",
-      text: {filled: "text-white", outline: "border-cancel"}
+      text: { filled: "text-white", outline: "border-cancel" },
     },
     red: {
       bg: "bg-attention",
       border: "border-attention",
-      text: {filled: "text-white", outline: "border-attention"}
+      text: { filled: "text-white", outline: "border-attention" },
     },
   };
 
   const { bg, border, text: textMap } = colorMap[color];
-  const text = textMap[variant]
+  const text = textMap[variant];
 
   const variantMap = {
     filled: `${bg} border-none ${text}`,
