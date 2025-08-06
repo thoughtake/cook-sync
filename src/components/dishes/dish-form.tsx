@@ -13,6 +13,7 @@ import useDishes from "@/hooks/use-dishes";
 import useDishIngredients from "@/hooks/use-dish-Ingredients";
 import useDishRecipes from "@/hooks/use-dish-recipes";
 import useUnits from "@/hooks/use-units";
+import { fetchJson } from "@/libs/api/fetchJson";
 
 //料理タイプ（編集用）
 type EditedDish = Pick<Dish, "isFavorite" | "imageUrl"> &
@@ -241,23 +242,15 @@ const DishForm = (props: Props) => {
       }));
 
     try {
-      const res = await fetch(`api/dishes`, {
+      await fetchJson({
+        url: `api/dishes`,
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           dish: newDish,
           ingredients: newDishIngredients,
           recipes: newDishRecipes,
         }),
       });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "登録に失敗しました。");
-      }
 
       //取得
       await mutateDishes();
@@ -294,7 +287,7 @@ const DishForm = (props: Props) => {
       //材料と量が入力されていないものは省く
       .filter(
         (ingredient) =>
-          (ingredient.ingredientId !== undefined) && ingredient.quantity
+          ingredient.ingredientId !== undefined && ingredient.quantity
       )
       .map((ingredient) => ({
         dishId: ingredient.dishId,
@@ -312,26 +305,16 @@ const DishForm = (props: Props) => {
         description: recipe.description,
       }));
 
-
     try {
-      const res = await fetch(`api/dishes/${props.dishId}`, {
+      await fetchJson({
+        url: `api/dishes/${props.dishId}`,
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           dish: newDish,
           ingredients: newDishIngredients,
           recipes: newDishRecipes,
         }),
       });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        console.error("詳細エラー", result.details);
-        throw new Error(result.error || "更新に失敗しました。");
-      }
 
       //取得
       await mutateDishes();

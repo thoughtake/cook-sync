@@ -1,6 +1,7 @@
 import ModalConfirm from "@/components/common/ui/modal/modal-confirm";
 import { useModal } from "@/context/modal-context";
 import { KeyedMutator } from "swr";
+import { fetchJson } from "./fetchJson";
 
 export type DeleteItemParams<T> = {
   id: number;
@@ -15,14 +16,11 @@ export const deleteItem = async <T,>({
 }: DeleteItemParams<T>): Promise<void> => {
   if (id) {
     try {
-      const res = await fetch(`${endpoint}/${id}`, {
-        method: "DELETE",
-      });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "削除に失敗しました");
-      }
+      await fetchJson({
+        url: `${endpoint}/${id}`,
+        method: "DELETE"
+      })
 
       //GET
       await mutate();

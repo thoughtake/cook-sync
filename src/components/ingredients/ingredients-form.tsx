@@ -9,6 +9,7 @@ import useIngredients from "@/hooks/use-ingredients";
 import useIngredientGroups from "@/hooks/use-ingredient-groups";
 import useUnits from "@/hooks/use-units";
 import SelectBox from "../common/ui/form/select-box";
+import { fetchJson } from "@/libs/api/fetchJson";
 
 type Props = {
   targetId: number | null;
@@ -117,19 +118,11 @@ const IngredientsForm = (props: Props) => {
     };
 
     try {
-      const res = await fetch("/api/ingredients", {
+      await fetchJson({
+        url: "/api/ingredients",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(newIngredient),
       });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "登録に失敗しました。");
-      }
 
       //取得
       await mutateIngredients();

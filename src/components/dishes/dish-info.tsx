@@ -3,7 +3,7 @@ import useDishIngredients from "@/hooks/use-dish-Ingredients";
 import useDishRecipes from "@/hooks/use-dish-recipes";
 import useIngredients from "@/hooks/use-ingredients";
 import useUnits from "@/hooks/use-units";
-import { Dish, DishIngredient, DishRecipe} from "@/types";
+import { Dish, DishIngredient, DishRecipe } from "@/types";
 import {
   BadgeJapaneseYen,
   Heart,
@@ -13,11 +13,12 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import {  useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import IconButton from "../common/ui/button/icon-button";
 import { useDeleteItemWithConfirm } from "@/libs/api/deleteItem";
 import DishForm from "./dish-form";
 import { useModal } from "@/context/modal-context";
+import { fetchJson } from "@/libs/api/fetchJson";
 
 const DishInfo = ({ dishId }: { dishId: number }) => {
   const { dishes, mutateDishes } = useDishes();
@@ -29,7 +30,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
   const [imageIsError, setImageIsError] = useState<boolean>(false);
 
   //モーダルスクロール用
-    const {scrollTop} = useModal();
+  const { scrollTop } = useModal();
 
   //削除
   const deleteConfirm = useDeleteItemWithConfirm({
@@ -93,33 +94,17 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
     return Math.round(totalPrice / dish.servings);
   }, [ingredientsForDish, ingredients, units, dish]);
 
-  // const isEditedDishLoaded = () => {
-  //   return (
-  //     !editedDish &&
-  //     editedDishIngredients.length !== 0 &&
-  //     editedDishRecipes.length !== 0
-  //   );
-  // };
-
   //お気に入り登録
   const handleClickFavorite = async () => {
     if (!dish) return;
     const newFavorite = { ...dish, isFavorite: !dish.isFavorite };
 
     try {
-      const res = await fetch(`api/dishes/${dish.id}/favorite`, {
+      await fetchJson({
+        url: `api/dishes/${dish.id}/favorite`,
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(newFavorite),
       });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "更新に失敗しました");
-      }
 
       //取得
       await mutateDishes();
@@ -136,7 +121,7 @@ const DishInfo = ({ dishId }: { dishId: number }) => {
       {/* 編集中かどうかで分岐 */}
       {isEditMode ? (
         <DishForm
-        dishId={dishId}
+          dishId={dishId}
           dish={dish}
           ingredientsForDish={ingredientsForDish}
           recipesForDish={recipesForDish}
