@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["www.free-materials.com"],
   },
-  reactStrictMode: false, 
+  reactStrictMode: true, 
 };
 
 export default nextConfig;

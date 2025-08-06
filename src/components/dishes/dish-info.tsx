@@ -1,5 +1,5 @@
 import useDishes from "@/hooks/use-dishes";
-import useDishIngredients from "@/hooks/use-dish-Ingredients";
+import useDishIngredients from "@/hooks/use-dish-ingredients";
 import useDishRecipes from "@/hooks/use-dish-recipes";
 import useIngredients from "@/hooks/use-ingredients";
 import useUnits from "@/hooks/use-units";
