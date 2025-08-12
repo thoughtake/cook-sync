@@ -50,7 +50,7 @@ export default function RootLayout({
         {isClient && (
           <ModalProvider>
             <Header />
-            <Container className={"pb-15"}>{children}</Container>
+            <Container className={"py-15"}>{children}</Container>
             <Modal />
             <Footer />
           </ModalProvider>
