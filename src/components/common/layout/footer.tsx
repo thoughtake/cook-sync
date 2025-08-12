@@ -27,7 +27,7 @@ const NavLink = ({ href, label }: { href: string; label: string }) => {
 
 const Footer = () => {
   return (
-    <footer className="bg-primary h-15 fixed bottom-0 left-0 w-full">
+    <footer className="bg-primary h-15 fixed bottom-0 left-0 w-full z-20">
       <Container className="h-full">
         <nav className="h-full py-1.5">
           <ul className="flex h-full">

@@ -18,7 +18,7 @@ const Header = () => {
   const pathname = usePathname();
 
   return (
-    <header className="bg-primary h-15">
+    <header className="bg-primary h-15 w-full fixed z-20">
       <Container>
         <div className="flex justify-between items-center h-15">
           <Link href="/">
