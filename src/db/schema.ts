@@ -77,3 +77,11 @@ export const dishRecipes = mysqlTable("dish_recipes", {
   stepNumber: int("step_number").notNull(),
   description: varchar("description", { length: 1000 }).notNull(),
 });
+
+export const pantries = mysqlTable("pantries", {
+  id: int("id").autoincrement().primaryKey(),
+  ingredientId: int("ingredient_id")
+    .notNull()
+    .references(() => ingredients.id),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull(),
+});
