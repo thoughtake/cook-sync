@@ -78,6 +78,7 @@ export const dishRecipes = mysqlTable("dish_recipes", {
   description: varchar("description", { length: 1000 }).notNull(),
 });
 
+// 在庫
 export const pantries = mysqlTable("pantries", {
   id: int("id").autoincrement().primaryKey(),
   ingredientId: int("ingredient_id")
