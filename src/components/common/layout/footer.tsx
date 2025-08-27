@@ -38,6 +38,9 @@ const Footer = () => {
               <NavLink href="/dishes" label="料理" />
             </li>
             <li className="flex-1">
+              <NavLink href="/pantries" label="在庫" />
+            </li>
+            <li className="flex-1">
               <NavLink href="/ingredients" label="材料" />
             </li>
           </ul>

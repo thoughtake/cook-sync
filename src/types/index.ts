@@ -46,3 +46,9 @@ export type DishRecipe = {
     stepNumber: number,
     description: string,
 }
+
+export type Pantry = {
+  id: number,
+  ingredientId: number,
+  quantity: string,
+}

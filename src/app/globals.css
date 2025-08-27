@@ -3,7 +3,7 @@
 
 
 :root {
-  --background: #ffffff;
+  --background: #FFF9EB;
   --foreground: #171717;
   --font-stack: YakuHanJP,
   system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell,
@@ -19,7 +19,7 @@
   --color-text: #000000;
   --color-attention: #fb2c36;
   --color-cancel: #99a1af;
-  --color-background: #FFF9EB
+  /* --color-background: #FFF9EB; */
 }
 
 @theme inline {

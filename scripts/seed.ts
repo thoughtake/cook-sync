@@ -7,6 +7,7 @@ import {
   dishes,
   dishIngredients,
   dishRecipes,
+  pantries,
 } from "@/db/schema";
 
 async function seed() {
@@ -22,7 +23,7 @@ async function seed() {
       { name: "g", amountPerUnit: 100 },
       { name: "ml", amountPerUnit: 100 },
     ]);
-    console.log("Units seeded");
+    console.log("units seeded");
   }
 
   //分類
@@ -45,7 +46,7 @@ async function seed() {
         { name: "お菓子" },
         { name: "その他" },
       ]);
-    console.log("Ingredient groups seeded");
+    console.log("ingredient_groups seeded");
   }
 
   //材料
@@ -216,7 +217,7 @@ async function seed() {
       },
       { name: "三温糖", ingredientGroupId: 7, unitId: 2, pricePerUnit: 30 },
     ]);
-    console.log("Ingredients seeded");
+    console.log("ingredients seeded");
   }
 
   const existingColors = await db.select().from(ingredientGroupColors);
@@ -288,7 +289,7 @@ async function seed() {
         textColorCode: "#757575",
       },
     ]);
-    console.log("Ingredient group colors seeded");
+    console.log("ingredient_group_colors seeded");
   }
 
   const existingDishes = await db.select().from(dishes);
@@ -303,6 +304,7 @@ async function seed() {
           "https://www.free-materials.com/adm/wp-content/uploads/2019/05/adpDSC_4094-.jpg",
       },
     ]);
+    console.log("dishes seeded");
   }
 
   const existingDishIngredients = await db.select().from(dishIngredients);
@@ -364,6 +366,7 @@ async function seed() {
         quantity: "15",
       },
     ]);
+    console.log("dish_ingredients seeded");
   }
 
   const existingDishRecipes = await db.select().from(dishRecipes);
@@ -410,6 +413,58 @@ async function seed() {
         description: "器に盛り付けて完成です。",
       },
     ]);
+    console.log("dish_recipes seeded");
+  }
+
+    const existingPantries = await db.select().from(pantries);
+  if (existingPantries.length === 0) {
+    await db.insert(pantries).values([
+      {
+        ingredientId: 12, // 豚こま切れ
+        quantity: "200",
+      },
+      {
+        ingredientId: 3, // じゃがいも
+        quantity: "3",
+      },
+      {
+        ingredientId: 1, // にんじん
+        quantity: "1",
+      },
+      {
+        ingredientId: 2, // 玉ねぎ
+        quantity: "1",
+      },
+      {
+        ingredientId: 40, // 水
+        quantity: "200",
+      },
+      {
+        ingredientId: 25, // しょうゆ
+        quantity: "30",
+      },
+      {
+        ingredientId: 27, // 料理酒
+        quantity: "30",
+      },
+      {
+        ingredientId: 26, // みりん
+        quantity: "30",
+      },
+      {
+        ingredientId: 92, // 類粒和風だし
+        quantity: "4.5",
+      },
+      {
+        ingredientId: 93, // 三温糖
+        quantity: "18",
+      },
+      {
+        ingredientId: 31, // サラダ油
+        quantity: "15",
+      },
+    ]);
+    console.log("pantries seeded");
   }
 
   console.log("Seeding complete.");
